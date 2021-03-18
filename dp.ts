@@ -178,9 +178,18 @@ testMaxArea(maxArea_dp_iter_m)
 
 
 // question3: max length of palindromes string
-function palindromes(str: string) {
+// version 1: the sub string must be continuous 
+// e.g. wawbaecebechcwbc --> [waw,ece,ebe,cebec,chc] -> 'cebec'
+// version 2: the sub string only need to keep in order
+// e.g. wawbaecebechcwbc --> 'bcebecb'
+function palindromes_continuous(str: string) {
+  const n = str.length, dp = [];
+  for (let i = 0; i < n; i++) {
+
+  }
 
 }
+
 
 // question4: provided n1+n2+n3+...nk=n(1<=k<=n),return [n1,n2,n3,...,nk]
 function permutation_of_n(n: number): number[][] {
