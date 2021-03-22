@@ -21,9 +21,9 @@ function maxSumSubArray(nums: number[]) {
     }
 
     p = t
-    console.log(max, p, nums[i])
+    // console.log(max, p, nums[i])
   }
-  console.log(marr)
+  // console.log(marr)
   return max
 }
 
@@ -35,8 +35,7 @@ function maxProductSubArray(nums: number[]) {
     p2 = nums[0]
   let max = nums[0]
   for (let i = 1; i < nums.length; i++) {
-    console.log('current', nums[i])
-
+    // console.log('current', nums[i])
     if (nums[i] < 0) {
       let t2 = p1 * nums[i]
       p1 = p2 * nums[i]
@@ -207,8 +206,8 @@ function palindromes_discrete(str: string) {
   return substrs;
 }
 
-console.log(palindromes_continuous('wawbaecebechcwbc').join(','))
-console.log(palindromes_discrete('wawbaecebechcwbc').join(','))
+// console.log(palindromes_continuous('wawbaecebechcwbc').join(','))
+// console.log(palindromes_discrete('wawbaecebechcwbc').join(','))
 
 // question4: provided n1+n2+n3+...nk=n(1<=k<=n),return [n1,n2,n3,...,nk]
 function permutation_of_n(n: number): number[][] {
@@ -328,22 +327,13 @@ function backpack_dp_W_N(W: number, N: number, w: number[], v: number[]) {
   return dp[w.length][W][N]
 }
 
+// TODO
 // the number of items is not specified and each item can be selected more than one time
 function backpack_dp_W_repeat(W: number, w: number[], v: number[]) {
   const dp = []
   for (let i = 0; i <= w.length; i++) {
     dp[i] = []
     for (let k = 0; k <= W; k++) {
-      dp[i][k] = []
-      if (i === 0 || k === 0) {
-        dp[i][k] = 0
-        continue
-      }
-      if (k < w[i - 1]) {
-        dp[i][k] = dp[i - 1][k]
-        continue
-      }
-      dp[i][k] = Math.max(dp[i - 1][k], dp[i - 1][k - w[i - 1]] + v[i - 1])
     }
   }
   return dp[w.length][W]
@@ -355,14 +345,163 @@ const vi = [4, 5, 2, 8, 3, 11, 9, 4]
 function testBackpack(func) {
   console.log(func(20, 8, wi, vi))
 }
+
 // testBackpack(backpack_recursion)
 // testBackpack(backpack_dp_W)
 // console.log(backpack_dp_W_N(20, 3, wi, vi))
 
 
 // question6: given two or more string[array], find the longest substring[subArray] of them
-// e.g. str1=whatwillyoudoforlove, str2=nothingwillido
+// e.g. str1=whatwillyoudoforlove, str2=nothingwillido --> 'will
+// suppose str2 is shorter than str1
 function commonSubstr(str1: string, str2: string) {
-  let str = ''
-  return str;
+  let dp = [], maxlen = 0, index = -1;
+
+  for (let i = 0; i < str1.length; i++) {
+    dp[i] = []
+    for (let j = 0; j < str2.length; j++) {
+      if (i === 0 || j === 0) { dp[i][j] = str1[i] === str2[j] ? 1 : 0; continue }
+      if (str1[i] === str2[j]) {
+        dp[i][j] = dp[i - 1][j - 1] + 1;
+        if (dp[i][j] > maxlen) {
+          index = i
+          maxlen = dp[i][j]
+        }
+      } else {
+        dp[i][j] = 0
+      }
+
+    }
+  }
+  return str1.substring(index - maxlen + 1, index + 1);
 }
+
+// console.log(commonSubstr('whatwillyoudoforlove', 'nothingwillido'))
+// console.log(commonSubstr('whatwillyoudoforlove', 'nothingwillidoforanything'))
+
+
+// TODO:
+// question 7: given rows*cols squares, which sum of numbers of rows and cols equals k cann't be touched
+// a robot start at (0,0) and can move to left right up down by one step, return how many squares can be touched
+function availableSquare(k: number, rows: number, cols: number) {
+  let dp = [], t = rows * cols;
+  if (k <= 0) {
+    return 0;
+  }
+  for (let i = 0; i < rows; i++) {
+    dp[i] = []
+    for (let j = 0; j < cols; j++) {
+
+      if (i === 0 || j === 0) {
+        dp[i][j] = isAvailable(k, i, j) ? 1 : 0;
+      } else {
+        dp[i][j] = isAvailable(k, i, j) ? (dp[i - 1][j] || dp[i][j - 1]) ? 1 : -1 : 0;
+      }
+      if (dp[i][j] < 0) t--
+    }
+  }
+  console.log(dp)
+  return t
+}
+
+// console.log(availableSquare(5, 3, 4))
+// console.log(availableSquare(8, 24, 20))
+// console.log(availableSquare(10, 24, 20))
+
+
+function isAvailable(k: number, rows: number, cols: number) {
+  while (rows > 0) {
+    k -= rows % 10
+    rows = Math.floor(rows / 10)
+  }
+  while (cols > 0) {
+    k -= cols % 10
+    cols = Math.floor(cols / 10)
+  }
+  return k > 0
+}
+
+// console.log(isAvailable(14, 23, 45))
+// console.log(isAvailable(15, 23, 45))
+
+// question 8: print binary tree in zigzag order
+// see treeSort.ts print function 
+
+
+// question 9: jump
+// given an array, array[i] means max jump step in current position 
+// return whether if it's possible jumping from 0 to the last
+function canijump(array) {
+  let dp = [true];
+  for (let i = 1; i < array.length; i++) {
+    dp[i] = false;
+    for (let j = 0; j < i; j++) {
+      if (dp[j] && array[j] >= i - j) {
+        dp[i] = true
+      }
+    }
+  }
+  return dp[array.length - 1]
+}
+
+// console.log(canijump([2, 3, 1, 1, 6]))
+// console.log(canijump([4, 2, 1, 0, 0, 6]))
+
+
+// TODO:
+// question 10: buying and selling of stock
+function stock() {
+
+}
+
+// question 11: max increasing subArray, even though discrete
+function maxIncreasingSubArray(array) {
+  let dp = [[array[0]]], k = 0, maxlen = 0
+
+  for (let i = 1; i < array.length; i++) {
+    dp[i] = []
+    for (let j = i - 1; j >= 0; j--) {
+      if (dp[j] === []) {
+        continue
+      }
+      if (array[i] >= dp[j][dp[j].length - 1]) {
+        dp[i] = dp[j].concat()
+        break;
+      }
+    }
+    dp[i].push(array[i])
+    if (dp[i].length >= maxlen) {
+      k = i;
+      maxlen = dp[i].length
+    }
+  }
+  return dp[k]
+}
+// console.log(maxIncreasingSubArray([-1, 4, -2, 9, 3, 10, -2, 4, 5, 3, 1, 6, 6]))
+
+// question 12: given k, find k numbers of different and no-overlap subArrays 
+// make sum of elements of these subArrays max 
+// dp[n][j]
+function maxSumofSubArrays(array: number[], k) {
+  let dp = [];
+  for (let n = 0; n <= k; n++) {
+    dp[n] = []
+    for (let j = 0; j < array.length; j++) {
+      if (n === 0) {
+        dp[n][j] = maxSumSubArray(array.slice(0, j + 1));
+      } else {
+        dp[n][j] = -Infinity
+        for (let k = n; k < j; k++) {
+          dp[n][j] = Math.max(dp[n][j], dp[n - 1][k] + maxSumSubArray(array.slice(k + 1, j + 1)))
+
+        }
+      }
+
+    }
+  }
+  return dp[k - 1][array.length - 1]
+}
+
+console.log(maxSumofSubArrays([-1, 4, -2, 3, -2, 3], 2))
+console.log(maxSumofSubArrays([-1, 4, -2, 3, -2, 3], 1))
+

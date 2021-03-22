@@ -16,6 +16,44 @@ class Tree {
     this.mid_order(this.root);
   }
 
+  printInZigzag() {
+    let stack1 = [this.root], stack2 = [];
+    let res = [], index = 0;
+    while (true) {
+      res[index] = []
+      if (index % 2 === 0) {
+        while (stack1.length > 0) {
+          let p = stack1.pop();
+          res[index].push(p.value);
+          if (p.left) {
+            stack2.push(p.left)
+          }
+          if (p.right) {
+            stack2.push(p.right)
+          }
+
+        }
+      } else {
+        while (stack2.length > 0) {
+          let p = stack2.pop();
+          res[index].push(p.value);
+          if (p.right) {
+            stack1.push(p.right)
+          }
+          if (p.left) {
+            stack1.push(p.left)
+          }
+        }
+      }
+      if (stack1.length === 0 && stack2.length === 0) {
+        break;
+      }
+      index++
+    }
+    console.log(res)
+    return res
+  }
+
   mid_order(node: TreeNode) {
     if (!node) {
       return
@@ -175,6 +213,11 @@ class Tree {
     pre_order(this.root, 0);
     console.log(lines)
   }
+
+  showTree() {
+    console.log(JSON.stringify(this.root))
+  }
+
 }
 
 class TreeNode {
@@ -199,9 +242,9 @@ tree.print()
 tree.insert(4)
 tree.insert(14)
 tree.print()
-console.log('NUM', tree.getNodeNumber(tree.root))
-console.log('15th', tree.getNthLargest(tree.root, 15))
-console.log('10th', tree.getNthLargest(tree.root, 10))
+// console.log('NUM', tree.getNodeNumber(tree.root))
+// console.log('15th', tree.getNthLargest(tree.root, 15))
+// console.log('10th', tree.getNthLargest(tree.root, 10))
 
 tree.delete(tree.root.left)
 tree.print()
@@ -209,4 +252,4 @@ tree.draw()
 tree.insert(20)
 tree.insert(13)
 tree.draw()
-
+tree.printInZigzag()
