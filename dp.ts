@@ -327,20 +327,31 @@ function backpack_dp_W_N(W: number, N: number, w: number[], v: number[]) {
   return dp[w.length][W][N]
 }
 
-// TODO
+// full backpack
 // the number of items is not specified and each item can be selected more than one time
 function backpack_dp_W_repeat(W: number, w: number[], v: number[]) {
   const dp = []
-  for (let i = 0; i <= w.length; i++) {
-    dp[i] = []
-    for (let k = 0; k <= W; k++) {
+  for (let k = 0; k <= W; k++) {
+    dp[k] = 0
+    for (let i = 0; i < w.length; i++) {
+      if (k - w[i] >= 0) {
+        dp[k] = Math.max(dp[k], dp[k - w[i]] + v[i])
+      }
     }
   }
-  return dp[w.length][W]
+  // console.log(dp)
+  return dp[W]
 }
 
-const wi = [2, 3, 1, 4, 2, 6, 5, 2]
-const vi = [4, 5, 2, 8, 3, 11, 9, 4]
+// TODO
+// multiple backpack
+// w v n list the weight and value and number of items
+function backpack_dp_W_N_K(W: number, w: number[], v: number[], n: number[]) {
+
+}
+
+const wi = [2, 3, 1, 4, 2, 6, 5, 5]
+const vi = [4, 5, 2, 8, 3, 11, 9, 11]
 
 function testBackpack(func) {
   console.log(func(20, 8, wi, vi))
@@ -349,7 +360,7 @@ function testBackpack(func) {
 // testBackpack(backpack_recursion)
 // testBackpack(backpack_dp_W)
 // console.log(backpack_dp_W_N(20, 3, wi, vi))
-
+// console.log(backpack_dp_W_repeat(20, wi, vi))
 
 // question6: given two or more string[array], find the longest substring[subArray] of them
 // e.g. str1=whatwillyoudoforlove, str2=nothingwillido --> 'will
@@ -380,33 +391,92 @@ function commonSubstr(str1: string, str2: string) {
 // console.log(commonSubstr('whatwillyoudoforlove', 'nothingwillidoforanything'))
 
 
-// TODO:
 // question 7: given rows*cols squares, which sum of numbers of rows and cols equals k cann't be touched
 // a robot start at (0,0) and can move to left right up down by one step, return how many squares can be touched
-function availableSquare(k: number, rows: number, cols: number) {
-  let dp = [], t = rows * cols;
-  if (k <= 0) {
-    return 0;
-  }
+// version1: depth-first search
+function availableSquare_DFS(k: number, rows: number, cols: number) {
+  let path = [], t = 1, stack = [[0, 0]];
   for (let i = 0; i < rows; i++) {
-    dp[i] = []
+    path[i] = [];
     for (let j = 0; j < cols; j++) {
-
-      if (i === 0 || j === 0) {
-        dp[i][j] = isAvailable(k, i, j) ? 1 : 0;
-      } else {
-        dp[i][j] = isAvailable(k, i, j) ? (dp[i - 1][j] || dp[i][j - 1]) ? 1 : -1 : 0;
+      if (i === 0 && j === 0) {
+        path[i][j] = 1
       }
-      if (dp[i][j] < 0) t--
+      else { path[i][j] = 4 }
     }
   }
-  console.log(dp)
+  while (stack.length > 0) {
+    let start = stack.pop();
+    let i = start[0], j = start[1];
+    ([[0, 1], [0, -1], [1, 0], [-1, 0]]).forEach((vector) => {
+      let m = i + vector[0], n = j + vector[1];
+      while (0 <= m && m < rows && 0 <= n && n < cols && path[m][n] === 4) {
+        if (isAvailable(k, m, n)) {
+          stack.push([m, n])
+          path[m][n] = 1;
+          t++
+          m += vector[0];
+          n += vector[1];
+        } else {
+          path[m][n] = 0;
+          break;
+        }
+      }
+    })
+  }
+  // console.log(path)
   return t
 }
 
-// console.log(availableSquare(5, 3, 4))
-// console.log(availableSquare(8, 24, 20))
-// console.log(availableSquare(10, 24, 20))
+// version2: width-first search
+function availableSquare_WFS(k: number, rows: number, cols: number) {
+  let path = [], t = 1, stack = [[0, 0]];
+  for (let i = 0; i < rows; i++) {
+    path[i] = [];
+    for (let j = 0; j < cols; j++) {
+      if (i === 0 && j === 0) {
+        path[i][j] = 1
+      }
+      else { path[i][j] = 4 }
+    }
+  }
+  while (stack.length > 0) {
+    let start = stack.pop();
+    let i = start[0], j = start[1];
+    // four directions
+    [[i + 1, j], [i, j - 1], [i, j + 1], [i - 1, j]].forEach((pos) => {
+      let m = pos[0], n = pos[1]
+      if (m < 0 || m >= rows || n < 0 || n >= cols || path[m][n] !== 4) {
+        return;
+      }
+      if (isAvailable(k, m, n)) {
+        t++
+        path[m][n] = 1;
+        stack.push([m, n])
+      } else {
+        path[m][n] = 0;
+      }
+    })
+
+  }
+  // console.log(path)
+  return t
+}
+
+
+function testRobot(func) {
+  console.log(func.name)
+  console.log(func(2, 2, 2))
+  console.log(func(4, 3, 4))
+  console.log(func(5, 3, 4))
+  console.log(func(8, 14, 12))
+  console.log(func(8, 24, 20))
+  console.log(func(10, 24, 20))
+  console.log(func(12, 24, 20))
+}
+// testRobot(availableSquare_DFS)
+// testRobot(availableSquare_WFS)
+
 
 
 function isAvailable(k: number, rows: number, cols: number) {
@@ -448,11 +518,30 @@ function canijump(array) {
 // console.log(canijump([4, 2, 1, 0, 0, 6]))
 
 
-// TODO:
-// question 10: buying and selling of stock
-function stock() {
+// question 10: buying and selling of stock, no more than 2 transactions 
+function stock(array) {
+  let dp1 = [[0]];
+  for (let i = 1; i < array.length; i++) {
+    dp1[i] = []
+    dp1[i][i - 1] = array[i] - array[i - 1];
+    let min = array[i - 1]
+    for (let j = i - 2; j >= 0; j--) {
+      min = Math.min(min, array[j])
+      dp1[i][j] = Math.max(dp1[i - 1][j], array[i] - min)
+    }
 
+  }
+  let max = dp1[array.length - 1][0]
+  console.log(dp1)
+  for (let k = 1; k + 1 < array.length - 1; k++) {
+    max = Math.max(max, dp1[k][0] + dp1[array.length - 1][k + 1])
+  }
+  return max
 }
+
+// console.log(stock([5, 3, 3, 0, 7, 3, 1, 4, 9]))
+// console.log(stock([3, 3, 5, 0, 0, 3, 1, 4]))
+
 
 // question 11: max increasing subArray, even though discrete
 function maxIncreasingSubArray(array) {
@@ -502,6 +591,12 @@ function maxSumofSubArrays(array: number[], k) {
   return dp[k - 1][array.length - 1]
 }
 
-console.log(maxSumofSubArrays([-1, 4, -2, 3, -2, 3], 2))
-console.log(maxSumofSubArrays([-1, 4, -2, 3, -2, 3], 1))
+// console.log(maxSumofSubArrays([-1, 4, -2, 3, -2, 3], 2))
+// console.log(maxSumofSubArrays([-1, 4, -2, 3, -2, 3], 1))
 
+// TODO
+// question13: edit word1 to word2, how many operations do you need ?
+// only delete insert and replace one character is allowed
+function edit(word1: string, word2: string) {
+
+}

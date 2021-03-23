@@ -1,0 +1,198 @@
+<html>
+
+<head>
+  <title>DFS|WFS</title>
+  <link rel="stylesheet" type="text/css" href="index.css">
+  <script>
+    function isAvailable(k, rows, cols) {
+      while (rows > 0) {
+        k -= rows % 10
+        rows = Math.floor(rows / 10)
+      }
+      while (cols > 0) {
+        k -= cols % 10
+        cols = Math.floor(cols / 10)
+      }
+      return k > 0
+    }
+
+    function availableSquare_DFS(k, rows, cols) {
+      let path = [], t = 1, stack = [[0, 0]];
+      let tryout = [[0, 0, 1]];
+      for (let i = 0; i < rows; i++) {
+        path[i] = [];
+        for (let j = 0; j < cols; j++) {
+          if (i === 0 && j === 0) {
+            path[i][j] = 1
+          }
+          else { path[i][j] = 4 }
+        }
+      }
+
+      while (stack.length > 0) {
+        let start = stack.pop();
+        let i = start[0], j = start[1];
+        ([[0, 1], [0, -1], [1, 0], [-1, 0]]).forEach((vector) => {
+          let m = i + vector[0], n = j + vector[1], breakflag = 1;
+          while (0 <= m && m < rows && 0 <= n && n < cols) {
+            if (path[m][n] === 4) {
+              if (isAvailable(k, m, n)) {
+                stack.push([m, n])
+                path[m][n] = 1;
+                t++
+                // ok
+                tryout.push([m, n, 1]);
+                m += vector[0];
+                n += vector[1];
+              } else {
+                path[m][n] = 0;
+                // is not allowed
+                tryout.push([m, n, 0]);
+                breakflag = 0
+                break;
+              }
+            } else {
+              // repeat
+              tryout.push([m, n, -1]);
+              breakflag = -1
+              break
+            }
+          }
+          if (breakflag === 1) {
+            // out boundry
+            tryout.push([m, n, -2]);
+          }
+        })
+      }
+      // console.log(path)
+      return tryout
+    }
+
+    // version2: width-first search
+    function availableSquare_WFS(k, rows, cols) {
+      let path = [], t = 1, stack = [[0, 0]];
+      for (let i = 0; i < rows; i++) {
+        path[i] = [];
+        for (let j = 0; j < cols; j++) {
+          if (i === 0 && j === 0) {
+            path[i][j] = 1
+          }
+          else { path[i][j] = 4 }
+        }
+      }
+      let tryout = [[0, 0, 1]];
+      console.log(path)
+      while (stack.length > 0) {
+        let start = stack.pop();
+        let i = start[0], j = start[1];
+        // four directions
+        [[i + 1, j], [i, j - 1], [i, j + 1], [i - 1, j]].forEach((pos) => {
+
+          let m = pos[0], n = pos[1]
+          console.log(pos, path, m, n)
+          if (m < 0 || m >= rows || n < 0 || n >= cols || path[m][n] !== 4) {
+            // repeat or out boundry
+            tryout.push([m, n, -1]);
+            return;
+          }
+          if (isAvailable(k, m, n)) {
+            t++
+            path[m][n] = 1;
+            stack.push([m, n])
+            tryout.push([m, n, 1]);
+          } else {
+            path[m][n] = 0;
+            tryout.push([m, n, 0]);
+          }
+        })
+
+      }
+      // console.log(path)
+      return tryout
+    }
+
+  </script>
+</head>
+
+<body>
+
+  <div id="root">
+    <div id="view" style="width:800px;height:800px;margin:20px;border:1px solid black;">
+    </div>
+    <div class='operator'>
+      <form id='form' style="margin:50px;">
+        <input type="radio" id='DFS' name="method" value="1" />
+        <label for="DFS">Depth First Search</label>
+        <input type="radio" id='WFS' name="method" value="0" checked=true />
+        <label for="WFS">Width First Search</label>
+        <input type="number" placeholder="K" min=0 name='K' value=2 />
+        <input type="number" placeholder="Row" min=1 name='Row' value=2 />
+        <input type="number" placeholder="Col" min=1 name='Col' value=2 />
+        <input type="submit" value="start" />
+    </div>
+  </div>
+  <script>
+    var running = false;
+    var formEle = document.getElementById('form');
+    formEle.onsubmit = function onsubmit() {
+      if (running) {
+        alert('It has started. Please wait for monent.')
+        return;
+      }
+      running = true;
+      var viewEle = document.getElementById('view');
+      var p = [...(new FormData(formEle)).values()];
+      (function initView(m, n) {
+        //
+        function clear() {
+        }
+        var size = 100 / Math.max(n, m);
+        for (let i = 0; i < m; i++) {
+          for (let j = 0; j < n; j++) {
+            var square = document.createElement('div')
+            square.id = `${i},${j}`;
+            square.style = `width:${size}px;height:${size}px;background-color:gray;`;
+            viewEle.appendChild(square)
+          }
+        }
+
+        viewEle.style.width = `${n * size}px;`
+        viewEle.style.height = `${m * size}px;`
+
+      })(p[2], p[3])
+      var steps;
+      if (p[0]) {
+        steps = availableSquare_DFS(p[1], p[2], p[3])
+      } else {
+        steps = availableSquare_WFS(p[1], p[2], p[3])
+      }
+      console.log(steps)
+      steps.forEach((step, index) => {
+        setTimeout(() => {
+          var squareEle = document.getElementById(`${step[0]},${step[1]}`);
+          if (!squareEle) {
+            viewEle.style.border = '2px solid red;';
+          } else {
+            viewEle.style.border = 'none;';
+          }
+          if (step[2] === 1) {
+            squareEle.style.backgroundColor = 'green;';
+          } else if (step[2] === 0) {
+            squareEle.style.backgroundColor = 'black;';
+          }
+          squareEle.style.border = '2px solid yellow;';
+          if (index === steps.length - 1) {
+            running = false
+          }
+        }, 300 * index);
+      })
+      return false;
+    }
+
+  </script>
+  <style type="text/css">
+  </style>
+
+</body>
+
+</html>
