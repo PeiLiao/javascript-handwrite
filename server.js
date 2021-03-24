@@ -3,7 +3,7 @@ let http = require('http')
 let fs = require('fs')
 
 let handleRequest = (request, response) => {
-	fs.readFile('./public/index.html', null, function (error, data) {
+	fs.readFile('./index.html', null, function (error, data) {
 		if (error) {
 			response.writeHead(404)
 			respone.write('Whoops! File not found!')
