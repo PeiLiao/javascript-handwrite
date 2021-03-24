@@ -457,25 +457,29 @@ function availableSquare_WFS(k: number, rows: number, cols: number) {
         path[m][n] = 0;
       }
     })
-
   }
-  // console.log(path)
+  console.log(path)
   return t
 }
 
 
 function testRobot(func) {
   console.log(func.name)
-  console.log(func(2, 2, 2))
-  console.log(func(4, 3, 4))
-  console.log(func(5, 3, 4))
-  console.log(func(8, 14, 12))
-  console.log(func(8, 24, 20))
-  console.log(func(10, 24, 20))
-  console.log(func(12, 24, 20))
+  // console.log(func(2, 2, 2))
+  // console.log(func(4, 3, 4))
+  // console.log(func(5, 3, 4))
+  // console.log(func(8, 14, 12))
+  // console.log(func(8, 24, 20))
+  // console.log(func(10, 24, 20))
+  // console.log(func(12, 24, 20))
+  // console.log(func(11, 30, 30))
+  // console.log(func(12, 30, 30))
+  // console.log(func(16, 30, 30))
+  // console.log(func(14, 30, 30))
+
 }
 // testRobot(availableSquare_DFS)
-// testRobot(availableSquare_WFS)
+testRobot(availableSquare_WFS)
 
 
 
@@ -488,7 +492,7 @@ function isAvailable(k: number, rows: number, cols: number) {
     k -= cols % 10
     cols = Math.floor(cols / 10)
   }
-  return k > 0
+  return k >= 0
 }
 
 // console.log(isAvailable(14, 23, 45))

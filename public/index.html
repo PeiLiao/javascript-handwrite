@@ -81,7 +81,6 @@
         }
       }
       let tryout = [[0, 0, 1]];
-      console.log(path)
       while (stack.length > 0) {
         let start = stack.pop();
         let i = start[0], j = start[1];
@@ -115,82 +114,113 @@
 </head>
 
 <body>
-
+  <!-- style="width:800px;height:800px;margin:20px;border:1px solid black;" -->
   <div id="root">
-    <div id="view" style="width:800px;height:800px;margin:20px;border:1px solid black;">
+    <div id="view">
     </div>
+    <div id='cur'></div>
     <div class='operator'>
       <form id='form' style="margin:50px;">
         <input type="radio" id='DFS' name="method" value="1" />
         <label for="DFS">Depth First Search</label>
         <input type="radio" id='WFS' name="method" value="0" checked=true />
         <label for="WFS">Width First Search</label>
-        <input type="number" placeholder="K" min=0 name='K' value=2 />
-        <input type="number" placeholder="Row" min=1 name='Row' value=2 />
-        <input type="number" placeholder="Col" min=1 name='Col' value=2 />
+        <input type="number" placeholder="K" min=0 name='K' value=3 />
+        <input type="number" placeholder="Row" min=1 name='Row' value=4 />
+        <input type="number" placeholder="Col" min=1 name='Col' value=4 />
+        <input type="number" placeholder="Speed" min=50 name='Col' value=100 />
         <input type="submit" value="start" />
     </div>
   </div>
   <script>
     var running = false;
+    let size = 0;
     var formEle = document.getElementById('form');
     formEle.onsubmit = function onsubmit() {
       if (running) {
         alert('It has started. Please wait for monent.')
-        return;
+        return false;
       }
       running = true;
-      var viewEle = document.getElementById('view');
       var p = [...(new FormData(formEle)).values()];
       (function initView(m, n) {
         //
-        function clear() {
-        }
-        var size = 100 / Math.max(n, m);
+        var viewEle = document.getElementById('view');
+        viewEle.innerHTML = '';
+        size = 600 / Math.max(n, m);
+        var curEle = document.getElementById('cur');
+        curEle.style.width = size;
+        curEle.style.height = size;
+        curEle.style.left = 0;
+        curEle.style.top = 0;
         for (let i = 0; i < m; i++) {
           for (let j = 0; j < n; j++) {
             var square = document.createElement('div')
             square.id = `${i},${j}`;
+            square.className = 'square';
             square.style = `width:${size}px;height:${size}px;background-color:gray;`;
             viewEle.appendChild(square)
           }
         }
-
-        viewEle.style.width = `${n * size}px;`
-        viewEle.style.height = `${m * size}px;`
-
+        viewEle.style = `width:${n * size}px;height:${m * size}px;`
       })(p[2], p[3])
       var steps;
-      if (p[0]) {
+      if (Number(p[0])) {
         steps = availableSquare_DFS(p[1], p[2], p[3])
       } else {
         steps = availableSquare_WFS(p[1], p[2], p[3])
       }
-      console.log(steps)
+
+      var timeout = 0;
       steps.forEach((step, index) => {
+        timeout += step[2] >= 0 ? Number(p[4]) : 25;
         setTimeout(() => {
           var squareEle = document.getElementById(`${step[0]},${step[1]}`);
+          var viewEle = document.getElementById('view');
+          var curEle = document.getElementById('cur');
+          // console.log(step, viewEle, squareEle)
           if (!squareEle) {
-            viewEle.style.border = '2px solid red;';
+            viewEle.style.border = '1px solid red';
           } else {
-            viewEle.style.border = 'none;';
+            viewEle.style.border = 'none';
+            if (step[2] === 1) {
+              squareEle.style.backgroundColor = 'green';
+            } else if (step[2] === 0) {
+              squareEle.style.backgroundColor = 'black';
+            }
+            curEle.style.left = step[1] * size;
+            curEle.style.top = step[0] * size;
+
           }
-          if (step[2] === 1) {
-            squareEle.style.backgroundColor = 'green;';
-          } else if (step[2] === 0) {
-            squareEle.style.backgroundColor = 'black;';
-          }
-          squareEle.style.border = '2px solid yellow;';
+
           if (index === steps.length - 1) {
             running = false
           }
-        }, 300 * index);
+        }, timeout);
       })
       return false;
     }
 
   </script>
   <style type="text/css">
+    #root {
+      position: absolute;
+    }
+
+    #view {
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+    }
+
+    #cur {
+      position: absolute;
+      border: 2px solid red;
+    }
+
+    .square {
+      display: inline;
+    }
   </style>
 
 </body>
