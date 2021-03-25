@@ -1,5 +1,5 @@
 
-function toBinary(number, radix, fix): string[] {
+function toBinary(number, radix, fix): string {
 
   var f = '0'
   if (number < 0) {
@@ -46,7 +46,7 @@ function toBinary(number, radix, fix): string[] {
   // }
 
   e = r.toString(2).padStart(11, '0')
-  return [f, e, s]// f + e + s
+  return f + e + s
 }
 
 function testBinary(number, fix) {
@@ -55,19 +55,14 @@ function testBinary(number, fix) {
   console.log(number, b, s)
 }
 
-function getBinary(num) {
-  return (num >>> 0).toString(2);
-}
+
 // testBinary(1)
 // testBinary(10)
 // testBinary(5)
 // testBinary(5.2)
 // testBinary(0.8)
 // testBinary(0.5)
-testBinary(0.2, true)
-testBinary(0.1, true)
-testBinary(0.30000000000000004, false)
-testBinary(0.3, true)
+
 
 function addBinary(num, add) {
   if (!add.includes('1')) {
@@ -105,6 +100,10 @@ function and(str1, str2) {
 
 
 function add0203() {
+  testBinary(0.2, true)
+  testBinary(0.1, true)
+  testBinary(0.30000000000000004, false)
+  testBinary(0.3, true)
   // 0.1+0.2 
   console.log(addBinary('1001100110011001100110011001100110011001100110011010', '1100110011001100110011001100110011001100110011001101'))
   // 010110011001100110011001100110011001100110011001100111 
@@ -113,7 +112,6 @@ function add0203() {
   console.log(toDecimal('0011001100110011001100110011001100110011001100110100'))
   // 
   console.log(toDecimal('0011001100110011001100110011001100110011001100110100') * Math.pow(2, -2))
-  return addBinary(toBinary(0.1, 2, true)[2], '1' + toBinary(0.2, 2, true)[2].slice(0, 51))
 }
 console.log('0.1+0.2', add0203())
 // console.log(addBinary('10', '1101'))
