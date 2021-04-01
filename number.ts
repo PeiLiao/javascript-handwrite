@@ -113,6 +113,7 @@ function add0203() {
   // 
   console.log(toDecimal('0011001100110011001100110011001100110011001100110100') * Math.pow(2, -2))
 }
+
 console.log('0.1+0.2', add0203())
 // console.log(addBinary('10', '1101'))
 // console.log(addBinary('1001100110011010', '1100110011001101'))
@@ -123,4 +124,19 @@ function toDecimal(str) {
     num += str[s] * Math.pow(2, -1 - s)
   }
   return 1 + num;
+}
+
+function binaryToFloat(str) {
+  let s = str[0];
+  let e = str.subString(1, 12)
+  let base = str.subString(12, 64)
+
+}
+
+// TODO
+function showConevrt() {
+
+}
+function showAdd() {
+
 }
