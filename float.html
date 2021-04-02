@@ -1,14 +1,94 @@
 <html>
 
+<head>
+  <script>
+    function toBinary(number, radix, fix) {
+      var f = '0'
+      if (number < 0) {
+        number = 0 - number;
+        f = '1'
+      }
+      var r = 0, num = number;
+      if (num > 1) {
+        while (num > 1) {
+          num /= radix;
+          r++
+        }
+      } else {
+        while (num < 1) {
+          num *= radix
+          r--
+        }
+      }
+
+      // decimals
+      // fix 
+      num = fix ? parseFloat((num % 1).toPrecision(10)) : num % 1
+      var total = 52;
+      var s = '';
+      while (num !== 0 && total--) {
+        s += num * radix >= 1 ? 1 : 0
+        num = (num * radix) % 1
+      }
+
+      // carry bit
+      if (total < 0 && num * radix >= 1) {
+        s = (parseInt(s, 2) + 1).toString(2)
+        s = s.padStart(52, '0')
+      } else {
+        s = s.padEnd(52, '0')
+      }
+
+      var e = '';
+      r += 1023
+      e = r.toString(2).padStart(11, '0')
+      return f + e + s
+    }
+  </script>
+</head>
+
 <body>
-    <input type="number" />
-    <button>convert to binary</button>
-    <input>
-    <input type="text" />
-    <input type="text" />
-    <br />
-    <input type="text" />
-    <button>convert to float</button>
+  <div class="convertTo">
+    <div class="">
+      <input type="number" />
+      <button>convert to binary</button>
+      <span class="result"></span>
+    </div>
+    <div class="">
+      <div class="part1">
+        <p></p>
+        <p></p>
+      </div>
+      <div class="part2">
+        <p></p>
+        <p></p>
+      </div>
+      <div class="part3">
+        <p></p>
+        <p></p>
+      </div>
+    </div>
+  </div>
+  <br />
+  <div class="operator">
+    <p><input type="text" /></p>
+    <p><input type="text" /></p>
+    <button>start +</button>
+  </div>
+  <br />
+  <div class="convertFrom">
+    <input type="text" name="" />
+    <button>convert from binary</button>
+  </div>
+  <script>
+    function createBinaryEntity() {
+
+    }
+
+
+
+
+  </script>
 </body>
 
 </html>
