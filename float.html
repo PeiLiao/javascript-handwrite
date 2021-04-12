@@ -2,48 +2,66 @@
 
 <head>
   <script>
-    function toBinary(number, radix, fix) {
-      var f = '0'
+    function toBinary(number, fix) {
+      // step1: symbol
+      var s = '0'
       if (number < 0) {
         number = 0 - number;
-        f = '1'
+        s = '1'
       }
+
+      // step2: exponent
       var r = 0, num = number;
       if (num > 1) {
         while (num > 1) {
-          num /= radix;
+          num /= 2;
           r++
         }
       } else {
         while (num < 1) {
-          num *= radix
+          num *= 2
           r--
         }
-      }
-
-      // decimals
-      // fix 
-      num = fix ? parseFloat((num % 1).toPrecision(10)) : num % 1
-      var total = 52;
-      var s = '';
-      while (num !== 0 && total--) {
-        s += num * radix >= 1 ? 1 : 0
-        num = (num * radix) % 1
-      }
-
-      // carry bit
-      if (total < 0 && num * radix >= 1) {
-        s = (parseInt(s, 2) + 1).toString(2)
-        s = s.padStart(52, '0')
-      } else {
-        s = s.padEnd(52, '0')
       }
 
       var e = '';
       r += 1023
       e = r.toString(2).padStart(11, '0')
-      return f + e + s
+
+      // decimals
+      // fix 
+      num = fix ? parseFloat((num % 1).toPrecision(10)) : num % 1
+      var total = 52;
+      var base = '';
+      while (num !== 0 && total--) {
+        base += num * 2 >= 1 ? 1 : 0
+        num = (num * 2) % 1
+      }
+
+      // carry bit
+      if (total < 0 && num * 2 >= 1) {
+        base = (parseInt(base, 2) + 1).toString(2)
+        base = base.padStart(52, '0')
+      } else {
+        base = base.padEnd(52, '0')
+      }
+
+      return s + e + base
     }
+    function start() {
+      initBit('symbol', 1)
+      initBit('exponent', 11)
+      initBit('base', 52)
+    }
+
+    function initBit(part, num) {
+      var container = document.getElementById(part + 'bit');
+      for (var i = 0; i < num; i++) {
+        container.appendChild(document.createElement(span, { id: part + i }))
+      }
+    }
+
+
   </script>
 </head>
 
@@ -51,21 +69,25 @@
   <div class="convertTo">
     <div class="">
       <input type="number" />
-      <button>convert to binary</button>
-      <span class="result"></span>
+      <button onclick="start();">convert to binary</button>
+      <span class="float"></span>
     </div>
-    <div class="">
-      <div class="part1">
+    <div class="format">
+
+    </div>
+    <div class="result">
+      <div id="symbol">
         <p></p>
-        <p></p>
+        <p id="symbolbit"></p>
       </div>
-      <div class="part2">
+      <div id="exponent">
         <p></p>
-        <p></p>
+        <p id="exponentbit"></p>
       </div>
-      <div class="part3">
+      <div id='default' style="border: pot 1px black;">1</div>
+      <div id="base">
         <p></p>
-        <p></p>
+        <p id="basebit"></p>
       </div>
     </div>
   </div>
@@ -81,14 +103,12 @@
     <button>convert from binary</button>
   </div>
   <script>
-    function createBinaryEntity() {
-
-    }
-
-
 
 
   </script>
+  <style>
+
+  </style>
 </body>
 
 </html>
