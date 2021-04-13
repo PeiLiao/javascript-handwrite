@@ -1,15 +1,14 @@
 let http = require('http')
-
 let fs = require('fs')
 
 let handleRequest = (request, response) => {
 	response.writeHead(200, {
 		'Content-Type': 'text/html',
 	})
-	fs.readFile('./float.html', null, function (error, data) {
+	fs.readFile(`.${request.url === '/' ? '/index.html' : request.url}`, null, function (error, data) {
 		if (error) {
 			response.writeHead(404)
-			respone.write('Whoops! File not found!')
+			response.write('Whoops! File not found!')
 		} else {
 			response.write(data)
 		}
