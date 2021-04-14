@@ -133,10 +133,3 @@ function binaryToFloat(str) {
 
 }
 
-// TODO
-function showConevrt() {
-
-}
-function showAdd() {
-
-}
