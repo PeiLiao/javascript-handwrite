@@ -19,17 +19,18 @@ var max = _.reduce(_keepHighest, -Infinity)
 // console.log(max([35, 89, 57, 534, 354]))
 
 // curry function
-function curry(func, args) {
-	return function (otherArgs) {
-		curry(func, ...args, ...otherArgs)
+function curry(func, ...args) {
+	if (func.length <= args.length) {
+		return func(...args)
+	}
+	return function (...otherArgs) {
+		return curry(func, ...args, ...otherArgs)
 	}
 }
 
 // test curry
-function min(...args) {
-	return Math.min(...args)
+function min(a, b, c, d, e) {
+	return Math.min(a, b, c, d, e)
 }
-
-_.curry(min, 5)()
-
-console.log(min(2, 34, 4))
+var curryMin = curry(min, 4, 56)
+console.log(curryMin(32)(2)(34))
