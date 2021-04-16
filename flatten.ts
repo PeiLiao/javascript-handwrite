@@ -11,11 +11,11 @@ export function flatten(arr: any, depth: number) {
   });
 }
 
-console.log(flatten([1, [2], [2, [3], [4, [6, [4]]]]], 4));
-console.log(flatten([1, [2], [2, [3], [4, [6, [4]]]]], 5));
-console.log(flatten([1, [2], [2, [3], [4, [6, [4]]]]], 2));
-console.log(flatten([1, [2], [2, [3], [4, [6, [4]]]]], 3));
-console.log(flatten([1, [2], [2, [3], [4, [6, [4]]]]], 1));
+// console.log(flatten([1, [2], [2, [3], [4, [6, [4]]]]], 4));
+// console.log(flatten([1, [2], [2, [3], [4, [6, [4]]]]], 5));
+// console.log(flatten([1, [2], [2, [3], [4, [6, [4]]]]], 2));
+// console.log(flatten([1, [2], [2, [3], [4, [6, [4]]]]], 3));
+// console.log(flatten([1, [2], [2, [3], [4, [6, [4]]]]], 1));
 
 export function flatten_iter(arr: any, depth) {
   if (!Array.isArray(arr)) {
@@ -40,8 +40,8 @@ export function flatten_iter(arr: any, depth) {
   return curArr;
 }
 
-console.log(flatten_iter([1, [2], [2, [3], [4, [6, [4]]]]], 4));
-console.log(flatten_iter([1, [2], [2, [3], [4, [6, [4]]]]], 5));
-console.log(flatten_iter([1, [2], [2, [3], [4, [6, [4]]]]], 2));
-console.log(flatten_iter([1, [2], [2, [3], [4, [6, [4]]]]], 3));
-console.log(flatten_iter([1, [2], [2, [3], [4, [6, [4]]]]], 1));
+// console.log(flatten_iter([1, [2], [2, [3], [4, [6, [4]]]]], 4));
+// console.log(flatten_iter([1, [2], [2, [3], [4, [6, [4]]]]], 5));
+// console.log(flatten_iter([1, [2], [2, [3], [4, [6, [4]]]]], 2));
+// console.log(flatten_iter([1, [2], [2, [3], [4, [6, [4]]]]], 3));
+// console.log(flatten_iter([1, [2], [2, [3], [4, [6, [4]]]]], 1));

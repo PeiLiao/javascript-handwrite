@@ -1,3 +1,4 @@
+//
 function myNew(constructor, params) {
 	var obj = Object.create(null)
 	obj.__proto__ = constructor.prototype
@@ -25,5 +26,6 @@ function create2(obj) {
 	newObj.prototype = obj
 	return newObj
 }
-
-console.log(create({ a: 1 }), create2({ a: 1 }))
+var a1 = create({ a: 1 })
+var a2 = create2({ a: 1 })
+console.log(a1.a, a2.a)
