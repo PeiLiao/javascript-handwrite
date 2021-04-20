@@ -1,8 +1,5 @@
 // 二叉排序树，又叫二叉搜索树
 // 之所以能排序，是因为中序遍历得到一个有序数组
-
-import { flatten, flatten_iter } from "./flatten";
-
 // 之所以能查找，是因为很容易得到第K大的数，而无需完整遍历
 class Tree {
   root: TreeNode | null;
@@ -70,6 +67,41 @@ class Tree {
     }
   }
 
+  serialize() {
+    var str = '';
+    function midOrder(node: TreeNode) {
+      if (!node) {
+        str += '#,'
+        return;
+      }
+      if (!node.left && !node.right) {
+        str += node.value;
+        str += '!,'
+        return;
+      } else {
+        midOrder(node.left);
+        str += node.value + ',';;
+        midOrder(node.right);
+      }
+    }
+    midOrder(this.root)
+    return str;
+  }
+
+  static deserialize(str) {
+    var nodes: string[] = str.split(',')
+    while (nodes.length > 0) {
+      var node_l = nodes.shift()
+      var node_r = nodes.shift()
+      var root = new TreeNode(Number(node_r))
+      if (node_l !== '#') {
+        root.left = new TreeNode(Number(node_l.))
+      }
+
+    }
+  }
+
+  //#region 
   post_order(node: TreeNode) {
     if (!node) {
       return;
@@ -229,6 +261,8 @@ class Tree {
   showTree() {
     console.log(JSON.stringify(this.root));
   }
+
+  //#endregion
 }
 
 class TreeNode {
@@ -259,11 +293,13 @@ tree.insert(14);
 
 // tree.delete(tree.root.left)
 // tree.print()
-// tree.draw()
+tree.draw()
 // tree.insert(20)
 // tree.insert(13)
 // tree.draw()
 // tree.printInZigzag()
+
+console.log(tree.serialize())
 
 // Is arr a PostOrder of a search tree
 // to build a binary search tree and get it's post order, then diff it with the input array
@@ -415,10 +451,10 @@ function sumPath(pRoot: TreeNode, sum) {
   results.sort((a, b) => b.length - a.length);
   return results;
 }
-var testtree = new Tree([10, 5, 12, 4, 7]);
-testtree.draw();
-console.log(sumPath(testtree.root, 30));
-console.log(sumPath(testtree.root, 22));
+// var testtree = new Tree([10, 5, 12, 4, 7]);
+// testtree.draw();
+// console.log(sumPath(testtree.root, 30));
+// console.log(sumPath(testtree.root, 22));
 
 // I think it's a search question
 // nowcoder JZ38

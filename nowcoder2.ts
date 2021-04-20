@@ -39,9 +39,9 @@ function Permutation2(str: string) {
   var results = [str];
   str.split("").forEach((s, i) => {
     for (var j = i + 1; j < str.length; j++) {
-      var newstr = str.substring(0, i);
+      var newstr;
       if (s !== str[j]) {
-        newstr += str[j] + str.substring(i + 1, j) + s + str.substring(j + 1);
+        newstr = str.substring(0, i) + str[j] + str.substring(i + 1, j) + s + str.substring(j + 1);
         results.push(newstr);
       }
     }
@@ -49,14 +49,19 @@ function Permutation2(str: string) {
   return results;
 }
 
+
+import { insert } from './string.js'
 function Permutation(str: string) {
-  var set = new Set();
-  var dp = [""];
-  str.split("").forEach((s, i) => {
-    dp.map((string) => {
-      string + s;
-    });
-  });
+
+  var dp = [str[0]];
+  while (!(dp[0].length === dp[dp.length - 1].length && dp[0].length === str.length)) {
+    var s = dp.shift();
+    for (var i = 0; i <= s.length; i++) {
+      dp.push(insert(s, i, str[s.length]))
+    }
+  }
+  var set = new Set(dp);
+  return Array.from(set).sort()
 }
 
 // test
@@ -161,4 +166,177 @@ function FirstNotRepeatingChar(str) {
   }
 }
 
-console.log(FirstNotRepeatingChar("google"));
+// console.log(FirstNotRepeatingChar("google"));
+
+// find a path in [matrix] match [word]
+// a width first solution
+function hasPath(matrix, word) {
+  var m = matrix.length, n = matrix[0].length;
+  if (m == 0 || n == 0) { return false }
+  var path = []
+  for (var i = 0; i < m; i++) {
+    for (var j = 0; j < n; j++) {
+      if (matrix[i][j] === word[0]) {
+        path.push([[i, j]])
+      }
+    }
+  }
+  function _hasPath(_word, path) {
+    if (path.length === 0 || path[0].length === 0) return false;
+    if (_word.length === 0) { console.log(path); return true; }
+    var s = _word[0], newPath = [];
+    path.forEach((p) => {
+      var last = p[p.length - 1];
+      [[1, 0], [-1, 0], [0, 1], [0, -1]].forEach((dir) => {
+        var i = last[0] + dir[0], j = last[1] + dir[1]
+        if (i >= 0 && j >= 0 && i < m && j < n && matrix[i][j] && matrix[i][j] === s) {
+          if (p.concat().filter((po) => po[0] === i && po[1] === j).length === 0) {
+            newPath.push(p.concat([[i, j]]))
+          }
+        }
+      })
+    })
+    return _hasPath(_word.substring(1), newPath)
+  }
+  return _hasPath(word.substring(1), path)
+}
+
+//
+// console.log(hasPath([['a', 'd', 'c'], ['b', 'c', 'e'], ['f', 'd', 'g']], 'abcd'))
+// console.log(hasPath([['a', 'd', 'c'], ['b', 'c', 'e'], ['d', 'f', 'g']], 'dcg'))
+
+
+// if mirror of tree-A is equal with tree-A, tree-A is symmetrical
+function isSymmetrical(pRoot) {
+  // write code here
+  if (!pRoot) { return true }
+  function isMirror(p1, p2) {
+    if (p1 && p2) {
+      return p1.val === p2.val && isMirror(p1.left, p2.right) && isMirror(p1.right, p2.left)
+    }
+    if (!p1 && !p2) {
+      return true;
+    }
+    return false;
+  }
+  return isMirror(pRoot.left, pRoot.right);
+}
+
+
+// find a number in array, occurs more than half length of numbers times
+function MoreThanHalfNum_Solution(numbers) {
+  // write code here
+  var len = numbers.length / 2
+  var obj = {}
+  for (var n of numbers) {
+    if (!obj[n]) {
+      obj[n] = 1
+    } else {
+      obj[n]++
+    }
+    if (obj[n] > len) {
+      return n
+    }
+  }
+  return 0
+}
+
+// given [a,d,c,d,e...], if e>a, [a,e] is an InversePairs
+// worst: O(n) = n^2
+var _try = 0;
+function InversePairs(data) {
+  // write code here
+  var res = 0;
+  data.forEach((n, index) => {
+    for (var i = 0; i < index; i++) {
+      _try++
+      if (data[i] > n) {
+        res++
+      }
+    }
+  });
+  return res
+}
+
+
+// bad
+var hash_try = 0
+function InversePairs_hash(data) {
+  // write code here
+  var obj = {}, res = 0;
+  data.forEach((n, index) => {
+    if (!obj[n]) {
+      obj[n] = 1
+    } else {
+      obj[n]++
+    }
+    for (var i in obj) {
+      hash_try++
+      if (i > n) {
+        res += obj[i]
+      }
+    }
+  });
+  return res
+}
+
+var recursion_try = 0
+function InversePairs_recursion(data: number[]) {
+  if (data.length === 1) { return 0 }
+  var mid = Math.floor(data.length / 2), n = 0;
+  for (let i = 0; i < mid; i++) {
+    for (let j = mid; j < data.length; j++) {
+      recursion_try++
+      if (data[i] > data[j]) {
+        n++
+      }
+    }
+  }
+  var n1 = InversePairs_recursion(data.slice(0, mid));
+  var n2 = InversePairs_recursion(data.slice(mid));
+  return n + n1 + n2
+}
+
+
+// console.log(InversePairs([1, 3, 4, 6, 6, 3, 2, 2, 4, 5, 9, 8, 7, 9, 10, 2, 2, 3]))
+// console.log(InversePairs_hash([1, 3, 4, 6, 6, 3, 2, 2, 4, 5, 9, 8, 7, 9, 10, 2, 2, 3]))
+// console.log(InversePairs_recursion([1, 3, 4, 6, 6, 3, 2, 2, 4, 5, 9, 8, 7, 9, 10, 2, 2, 3]))
+// console.log(_try, hash_try, recursion_try)
+
+
+// 1,2,3,4,5,6,8,... product of 2,3,5
+function GetUglyNumber_Solution(index) {
+  // write code here
+  var arr = [1, 2, 3, 4, 5]
+
+  for (var i = 6; ; i++) {
+    var n = i;
+    [2, 3, 5].forEach((k) => {
+      while (n % k === 0) {
+        n /= k
+      }
+    })
+    if (n === 1) {
+      arr.push(i)
+      if (arr.length >= index) {
+        console.log(arr)
+        return arr[index - 1]
+      }
+    }
+
+  }
+}
+
+
+function GetUglyNumber_Solution2(index) {
+  var arr = [1, 2, 3, 4, 5]
+  for (var i = 0; ; i++) {
+    for (var j = 0; ; j++) {
+      for (var k = 0; ; k++) {
+
+      }
+    }
+  }
+}
+
+console.log(GetUglyNumber_Solution(200))
