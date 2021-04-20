@@ -90,15 +90,27 @@ class Tree {
 
   static deserialize(str) {
     var nodes: string[] = str.split(',')
-    while (nodes.length > 0) {
+    var root;
+    function parse() {
       var node_l = nodes.shift()
-      var node_r = nodes.shift()
-      var root = new TreeNode(Number(node_r))
+      var node_root = nodes.shift()
+      var root = new TreeNode(Number(node_root))
       if (node_l !== '#') {
-        root.left = new TreeNode(Number(node_l.))
+        root.left = new TreeNode(Number(node_l.replace('!', '')))
+      }
+
+      if (nodes[0].includes('!')) {
+        var node_r = nodes.shift();
+        root.right = new TreeNode(Number(node_r.replace('!', '')))
+        if (nodes.length === 0) {
+          root;
+        }
+      } else {
+        parse();
       }
 
     }
+    parse()
   }
 
   //#region 
