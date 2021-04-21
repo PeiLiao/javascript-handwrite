@@ -88,6 +88,7 @@ class Tree {
     return str;
   }
 
+  // TODO
   static deserialize(str) {
     var nodes: string[] = str.split(',')
     var root;

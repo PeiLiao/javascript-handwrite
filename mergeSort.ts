@@ -1,5 +1,5 @@
-var diff = 0
-function mergeSort(array: number[]) {
+export var diff = 0, swap = 0
+export function mergeSort(array: number[]) {
   if (array.length < 2) {
     return array;
   }
@@ -21,6 +21,7 @@ function merge(arrL: number[], arrR: number[]) {
     } else {
       res.push(arrR[j])
       j++
+      swap += arrL.length - i
     }
   }
 
@@ -35,4 +36,5 @@ function merge(arrL: number[], arrR: number[]) {
   return res;
 }
 
-console.log(mergeSort([3, 8, 6, 2, 4, 11, 7, 9, 5]), diff)
+// console.log(mergeSort([3, 8, 6, 2, 4, 11, 7, 9, 5]), diff)
+export default { mergeSort }

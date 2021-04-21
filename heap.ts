@@ -62,7 +62,7 @@ class MinHeap {
   }
 
 }
-class MaxHeap {
+export class MaxHeap {
   private elements: number[];
   constructor(elements) {
     this.elements = elements;
@@ -180,5 +180,5 @@ function medium() {
 // test
 for (var i of [1, 2, 5, 3, 6, 7, 4, 6, 5, 8, 9, 8, 4]) {
   insert(i)
-  console.log(medium())
+  // console.log(medium())
 }

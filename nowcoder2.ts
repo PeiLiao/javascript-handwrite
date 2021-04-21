@@ -298,14 +298,25 @@ function InversePairs_recursion(data: number[]) {
 }
 
 
+import { mergeSort, swap, diff } from './mergeSort';
+var merge_try = 0
+function InversePairs_merge(data: number[]) {
+  mergeSort(data)
+  console.log(swap, diff)
+}
+
 // console.log(InversePairs([1, 3, 4, 6, 6, 3, 2, 2, 4, 5, 9, 8, 7, 9, 10, 2, 2, 3]))
 // console.log(InversePairs_hash([1, 3, 4, 6, 6, 3, 2, 2, 4, 5, 9, 8, 7, 9, 10, 2, 2, 3]))
 // console.log(InversePairs_recursion([1, 3, 4, 6, 6, 3, 2, 2, 4, 5, 9, 8, 7, 9, 10, 2, 2, 3]))
 // console.log(_try, hash_try, recursion_try)
+// InversePairs_merge([1, 3, 4, 6, 6, 3, 2, 2, 4, 5, 9, 8, 7, 9, 10, 2, 2, 3])
+
+
 
 
 // 1,2,3,4,5,6,8,... product of 2,3,5
 function GetUglyNumber_Solution(index) {
+  var startTime = Date.now()
   // write code here
   var arr = [1, 2, 3, 4, 5]
 
@@ -319,24 +330,78 @@ function GetUglyNumber_Solution(index) {
     if (n === 1) {
       arr.push(i)
       if (arr.length >= index) {
-        console.log(arr)
+        // console.log(arr)
+        console.log(Date.now() - startTime)
         return arr[index - 1]
       }
     }
-
   }
+
+
 }
 
 
+// TODO
+import { MaxHeap } from './heap'
 function GetUglyNumber_Solution2(index) {
-  var arr = [1, 2, 3, 4, 5]
-  for (var i = 0; ; i++) {
-    for (var j = 0; ; j++) {
-      for (var k = 0; ; k++) {
+  var startTime = Date.now()
 
+  var arr = new MaxHeap([]), len = 0;
+  for (var d = 0; d < Math.log2(index); d++) {
+    for (var i = 0; i <= d; i++) {
+      for (var j = 0; j <= d - i; j++) {
+        var k = d - i - j;
+        arr.push(Math.pow(5, i) * Math.pow(3, j) * Math.pow(2, k))
+        len++
+        if (len === index) {
+          // console.log(arr)
+          console.log(Date.now() - startTime)
+          return arr.top()
+        }
       }
     }
   }
 }
+console.log(GetUglyNumber_Solution2(10))
+console.log(GetUglyNumber_Solution(10))
 
-console.log(GetUglyNumber_Solution(200))
+
+function PrintMinNumber(numbers: number[]) {
+  if (numbers.length === 0) return ""
+  if (numbers.length === 1) return numbers[0].toString()
+  var arr = []
+  numbers.forEach((n, index) => {
+    var nums = numbers.concat()
+    nums.splice(index, 1)
+    arr.push(n + PrintMinNumber(nums))
+  })
+  return arr.sort()[0]
+}
+
+// console.log(PrintMinNumber([3, 32, 321]))
+
+
+// given an increasing array [data], return number of k 
+function GetNumberOfK(data, k) {
+  // write code here
+
+  if (data.length === 0) return 0;
+
+  var mid = Math.floor(data.length / 2);
+  var res = 0;
+  if (data[mid] > k) {
+    return GetNumberOfK(data.slice(0, mid), k)
+  } else if (data[mid] === k) {
+    var i = mid, j = mid - 1;
+    while (data[i++] === k) {
+      res++
+    }
+    while (data[j--] === k) {
+      res++
+    }
+    return res
+  } else {
+    return GetNumberOfK(data.slice(mid + 1), k)
+  }
+}
+console.log(GetNumberOfK([1, 2, 3, 3, 3, 3, 4, 5], 3))

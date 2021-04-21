@@ -12,7 +12,7 @@ function mycall(ctx = window, ...args) {
 }
 
 // apply
-// the only difference between apply and call is
+// the only difference between apply and call is the remaining params
 function myApply(ctx = window, args) {
 	// if [callee] is Function.prototype, it means that function doesn't exist, so undefined is returned
 	if (this === Function.prototype) {
