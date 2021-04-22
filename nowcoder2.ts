@@ -362,8 +362,8 @@ function GetUglyNumber_Solution2(index) {
     }
   }
 }
-console.log(GetUglyNumber_Solution2(10))
-console.log(GetUglyNumber_Solution(10))
+// console.log(GetUglyNumber_Solution2(10))
+// console.log(GetUglyNumber_Solution(10))
 
 
 function PrintMinNumber(numbers: number[]) {
@@ -404,4 +404,36 @@ function GetNumberOfK(data, k) {
     return GetNumberOfK(data.slice(mid + 1), k)
   }
 }
-console.log(GetNumberOfK([1, 2, 3, 3, 3, 3, 4, 5], 3))
+// console.log(GetNumberOfK([1, 2, 3, 3, 3, 3, 4, 5], 3))
+
+
+function match(str, pattern) {
+  // write code here
+  let i, j;
+  for (i = 0, j = 0; i < str.length;) {
+    if (j === pattern.length) {
+      return false
+    }
+
+    if (str[i] === pattern[j] || pattern[j] === '.') {
+      i++;
+      j++;
+      continue;
+    }
+    if (j + 1 < pattern.length && pattern[j + 1] === '*') {
+      i++;
+      j += 2;
+      continue;
+    }
+
+    return false
+  }
+  for (; j < str.length;) {
+    if ()
+  }
+  return true;
+}
+
+console.log(match('aaa', 'ab*ac*a'))
+console.log(match('aaa', 'aa.a'))
+console.log(match('aaa', 'ab*a'))

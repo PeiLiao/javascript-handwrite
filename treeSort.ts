@@ -90,7 +90,7 @@ class Tree {
 
   // TODO
   static deserialize(str) {
-    var nodes: string[] = str.split(',')
+    var nodes: string[] = str.split('!').map((str) => str.split(','))
     var root;
     function parse() {
       var node_l = nodes.shift()
