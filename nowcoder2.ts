@@ -314,6 +314,7 @@ function InversePairs_merge(data: number[]) {
 
 
 
+// worst
 // 1,2,3,4,5,6,8,... product of 2,3,5
 function GetUglyNumber_Solution(index) {
   var startTime = Date.now()
@@ -331,40 +332,68 @@ function GetUglyNumber_Solution(index) {
       arr.push(i)
       if (arr.length >= index) {
         // console.log(arr)
-        console.log(Date.now() - startTime)
+        console.log('timer:', Date.now() - startTime)
         return arr[index - 1]
       }
     }
   }
-
-
 }
 
-
-// TODO
+// is not sorted
 import { MaxHeap } from './heap'
 function GetUglyNumber_Solution2(index) {
   var startTime = Date.now()
-
-  var arr = new MaxHeap([]), len = 0;
-  for (var d = 0; d < Math.log2(index); d++) {
+  var arr = [];
+  for (var d = 0; d < 53; d++) {
     for (var i = 0; i <= d; i++) {
       for (var j = 0; j <= d - i; j++) {
         var k = d - i - j;
-        arr.push(Math.pow(5, i) * Math.pow(3, j) * Math.pow(2, k))
-        len++
-        if (len === index) {
-          // console.log(arr)
-          console.log(Date.now() - startTime)
-          return arr.top()
-        }
+        var val = Math.pow(5, i) * Math.pow(3, j) * Math.pow(2, k)
+        arr.push(val)
       }
     }
   }
+  arr.sort((a, b) => a - b)
+  // console.log(arr.slice(0, index))
+  console.log('timer:', Date.now() - startTime)
+  return arr[index - 1]
 }
-// console.log(GetUglyNumber_Solution2(10))
-// console.log(GetUglyNumber_Solution(10))
 
+//
+function UglyNumber(index) {
+  var startTime = Date.now()
+  var arr = [1], i = 0, j = 0, k = 0
+  while (arr.length < index) {
+    if (arr[i] * 2 <= Math.min(arr[j] * 3, arr[k] * 5)) {
+      if (arr[i] * 2 > arr[arr.length - 1]) {
+        arr.push(arr[i] * 2)
+      }
+      i++
+    }
+    if (arr[j] * 3 <= Math.min(arr[i] * 2, arr[k] * 5)) {
+      if (arr[j] * 3 > arr[arr.length - 1]) {
+        arr.push(arr[j] * 3)
+      }
+      j++
+    }
+    if (arr[k] * 5 <= Math.min(arr[i] * 2, arr[j] * 3)) {
+      if (arr[k] * 5 > arr[arr.length - 1]) {
+        arr.push(arr[k] * 5)
+      }
+      k++
+    }
+  }
+  // console.log(arr)
+  console.log('timer:', Date.now() - startTime)
+  return arr[index - 1]
+}
+
+// console.log(GetUglyNumber_Solution(1200))
+// console.log(GetUglyNumber_Solution2(1200))
+// console.log(UglyNumber(1200))
+// console.log(GetUglyNumber_Solution(12000))
+// console.log(GetUglyNumber_Solution2(12000))
+// console.log(UglyNumber(12000))
 
 function PrintMinNumber(numbers: number[]) {
   if (numbers.length === 0) return ""
@@ -407,33 +436,63 @@ function GetNumberOfK(data, k) {
 // console.log(GetNumberOfK([1, 2, 3, 3, 3, 3, 4, 5], 3))
 
 
+//  . match any character
+// * means the previous character repeats 0-n times
 function match(str, pattern) {
-  // write code here
-  let i, j;
-  for (i = 0, j = 0; i < str.length;) {
-    if (j === pattern.length) {
-      return false
-    }
+  // console.log(str, pattern)
+  if (pattern.length === 0 && str.length === 0) {
+    return true
+  }
 
-    if (str[i] === pattern[j] || pattern[j] === '.') {
-      i++;
-      j++;
-      continue;
-    }
-    if (j + 1 < pattern.length && pattern[j + 1] === '*') {
-      i++;
-      j += 2;
-      continue;
-    }
-
+  if (pattern.length === 0) {
     return false
   }
-  for (; j < str.length;) {
-    if ()
+
+  if (str.length === 0) {
+    if (pattern.length % 2 === 0) {
+      pattern.split('').forEach((c, idx) => {
+        if (idx % 2 === 1 && c !== '*') {
+          return false;
+        }
+      })
+      return true
+    } else {
+      return false
+    }
   }
-  return true;
+
+  if (str[0] === pattern[0] || pattern[0] === '.') {
+    if (pattern[1] === '*') {
+      for (var i = 0; i <= str.length; i++) {
+        if (match(str.substring(i), pattern.substring(2))) {
+          return true
+        }
+        if (i !== str.length && str[i] !== pattern[0] && pattern[0] !== '.') {
+          break;
+        }
+      }
+      return false
+    } else {
+      return match(str.substring(1), pattern.substring(1))
+    }
+
+  } else {
+    if (pattern[1] === '*') {
+      return match(str, pattern.substring(2))
+    } else {
+      return false
+    }
+  }
+
 }
 
-console.log(match('aaa', 'ab*ac*a'))
-console.log(match('aaa', 'aa.a'))
-console.log(match('aaa', 'ab*a'))
+// console.log(match('aaa', 'ab*ac*a'), true)
+// console.log(match('aaa', 'aa.a'), false)
+// console.log(match('aaa', 'ab*a'), false)
+// console.log(match('', '.*'), true)
+// console.log(match("a", ".*"), true)
+// console.log(match("aa", "a*"), true)
+// console.log(match("aaa", "a*a"), true)
+// console.log(match("aaba", "ab*a*c*a"), false)
+// console.log(match("aab", "c*a*b"), true)
+

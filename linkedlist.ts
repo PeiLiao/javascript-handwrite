@@ -32,11 +32,24 @@ var pHead2 = Linkedlist([5, 4, 4, 3, 5, 5, 6, 4, 4, 7, 7])
 // console.log(printLinkedlist(pHead))
 
 
-
-// TODO
 function FindFirstCommonNode(pHead1, pHead2) {
   // write code here
-
+  var p1 = pHead1, p2 = pHead2;
+  while (p1 && p2) {
+    p1 = p1.next;
+    p2 = p2.next;
+  }
+  if (!p1) {
+    p1 = pHead1
+  }
+  if (!p2) {
+    p2 = pHead2;
+  }
+  while (p1 && p2 && p1 !== p2) {
+    p1 = p1.next;
+    p2 = p2.next;
+  }
+  return p1
 }
 
 function deleteDuplication(pHead) {
@@ -64,7 +77,7 @@ function deleteDuplication(pHead) {
 //
 console.log(printLinkedlist(deleteDuplication(pHead)))
 
-
+// TODO
 // convert binary search tree to sortable linkedlist
 function Convert(pRootOfTree) {
   // write code here
@@ -74,25 +87,49 @@ function Convert(pRootOfTree) {
   }
 }
 
+// TODO
+function RandomListNode(x) {
+  this.label = x;
+  this.next = null;
+  this.random = null;
+}
 
-/*function RandomListNode(x){
-    this.label = x;
-    this.next = null;
-    this.random = null;
-}*/
 function deepClone(pHead) {
+  while (pHead.next) {
 
+  }
 }
 
+
+function TreeLinkNode(x) {
+  this.val = x;
+  this.left = null;
+  this.right = null;
+  this.next = null; // the brother node
+};
+// TODO
 function nextNodeInMidOrder(node) {
-  if (!node.prev) return node.right;
+
   if (node.right) {
-    return node.right
+    var right = node.right
+    while (right.left) {
+      right = right.left
+    }
+    return right;
   }
-  if (node.prev.left === node) {
-    return node.prev;
-  }
-  if (node.prev.right === node) {
-    return node.prev.prev
-  }
+
 }
+
+// if node has father reference
+// function nextNodeInMidOrder(node) {
+//   if (!node.prev) return node.right;
+//   if (node.right) {
+//     return node.right
+//   }
+//   if (node.prev.left === node) {
+//     return node.prev;
+//   }
+//   if (node.prev.right === node) {
+//     return node.prev.prev
+//   }
+// }

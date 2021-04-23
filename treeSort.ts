@@ -12,7 +12,7 @@ class Tree {
 
   print() {
     this.clear(this.root);
-    this.mid_order(this.root);
+    Tree.mid_order(this.root);
   }
 
   printInZigzag() {
@@ -54,16 +54,16 @@ class Tree {
     return res;
   }
 
-  mid_order(node: TreeNode) {
+  static mid_order(node: TreeNode) {
     if (!node) {
       return;
     }
     if (node.left) {
-      this.mid_order(node.left);
+      Tree.mid_order(node.left);
     }
     console.log(node.value);
     if (node.right) {
-      this.mid_order(node.right);
+      Tree.mid_order(node.right);
     }
   }
 
@@ -88,30 +88,72 @@ class Tree {
     return str;
   }
 
+  static serialize(root) {
+    var str = '';
+    function midOrder(node: TreeNode) {
+      if (!node) {
+        str += '#,'
+        return;
+      }
+      if (!node.left && !node.right) {
+        str += node.value;
+        str += '!,'
+        return;
+      } else {
+        midOrder(node.left);
+        str += node.value + ',';;
+        midOrder(node.right);
+      }
+    }
+    midOrder(root)
+    return str;
+  }
+
   // TODO
   static deserialize(str) {
-    var nodes: string[] = str.split('!').map((str) => str.split(','))
-    var root;
-    function parse() {
-      var node_l = nodes.shift()
-      var node_root = nodes.shift()
-      var root = new TreeNode(Number(node_root))
-      if (node_l !== '#') {
-        root.left = new TreeNode(Number(node_l.replace('!', '')))
+    var nodeArr: string[] = str.split(','), root = null;
+    function parse(father, nodes) {
+      console.log(nodes)
+      if (nodes.length === 0) return father;
+      if (nodes.length == 1) {
+        father.right = new TreeNode(node1.replace('!', ''));
+        return father;
       }
-
-      if (nodes[0].includes('!')) {
-        var node_r = nodes.shift();
-        root.right = new TreeNode(Number(node_r.replace('!', '')))
-        if (nodes.length === 0) {
-          root;
-        }
+      var node1 = nodes.shift();
+      var node2 = nodes.shift();
+      if (node1 === '#') {
+        node1 = null;
       } else {
-        parse();
+        node1 = new TreeNode(node1.replace('!', ''))
       }
+      node2 = new TreeNode(node2)
+      node2.left = node1;
+      if (!father) {
+        father = node2;
+      } else {
+        father.right = node2;
+      }
+      if (node1 && nodes[0] === '#' || nodes[0].includes('!')) {
+        if (node1 && nodes[0] === '#') {
+          nodes.shift()
+          node2.right = null;
+        }
+        if (nodes[0].includes('!')) {
+          node2.right = new TreeNode(nodes.shift().replace('!', ''))
+        }
 
+        if (nodes.length === 0) return father;
+        var newRoot = new TreeNode(nodes.shift())
+        newRoot.left = root
+        root = newRoot
+        root.right = parse(root, nodes)
+        return root;
+      } else {
+        node2.right = parse(node2, nodes)
+        return node2;
+      }
     }
-    parse()
+    return parse(null, nodeArr)
   }
 
   //#region 
@@ -277,6 +319,11 @@ class Tree {
 
   //#endregion
 }
+function BinaryTreeNode(val) {
+  this.val = val;
+  this.left = null;
+  this.right = null
+}
 
 class TreeNode {
   public value: number;
@@ -312,7 +359,11 @@ tree.draw()
 // tree.draw()
 // tree.printInZigzag()
 
-console.log(tree.serialize())
+// console.log(tree.serialize())
+// var treeRoot = Tree.deserialize('#,1,2!')
+// console.log(treeRoot)
+// console.log(Tree.serialize(treeRoot))
+console.log(Tree.serialize(Tree.deserialize('#,1,#,2,2!,3')))
 
 // Is arr a PostOrder of a search tree
 // to build a binary search tree and get it's post order, then diff it with the input array
