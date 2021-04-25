@@ -153,8 +153,8 @@ class Tree {
         return parse(newRoot, nodes);
       } else {
         console.log('2222222222222222222', root, node2)
-        var node = parse(node2, nodes);
-        console.log('11111111111111111111111', node, root, node2)
+        root.right = parse(node2, nodes);
+        console.log('11111111111111111111111', root, node2)
         return root
       }
     }
