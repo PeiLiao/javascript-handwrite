@@ -1,10 +1,3 @@
-// TODO AVL Tree
-
-
-// TODO use avl tree to obtain medium quickly
-
-
-
 // is tree balanced
 function IsBalanced_Solution(pRoot) {
   // write code here

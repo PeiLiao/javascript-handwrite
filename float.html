@@ -2,7 +2,16 @@
 
 <head>
   <script>
-    function toBinary(number, fix) {
+    var tick = 1000, step = 0;
+    function run(gen) {
+      var id = setInterval(() => {
+        if (!gen.next().value) {
+          clearInterval(id)
+        }
+      }, tick);
+    }
+
+    function* toBinary(number, fix) {
       // step1: symbol
       var s = '0'
       if (number < 0) {
@@ -24,9 +33,29 @@
         }
       }
 
+
+      yield document.getElementById('formula').innerHTML = `(${s === '0' ? '+' : '-'}) ${num}*2^${r}`;
+      yield document.getElementById('formula').style.borderBottom = '1px solid black';
+
+      yield document.getElementById('symbolSource').innerHTML = s === '0' ? '+' : '-';
+      yield document.getElementById('symbolbit').innerHTML = s;
+      yield document.getElementById('symbol').style.borderBottom = '1px solid black';
+
+      yield document.getElementById('exponentSource').innerHTML = r;
+      yield document.getElementById('default').innerHTML = 1;
+      yield document.getElementById('default').style.borderBottom = '1px solid black';
+
+      yield document.getElementById('baseSource').innerHTML = num - 1;
+
+
       var e = '';
       r += 1023
       e = r.toString(2).padStart(11, '0')
+
+      yield document.getElementById('exponentSource').innerHTML += `(${r})`;
+      yield document.getElementById('exponentbit').innerHTML = e;
+      yield document.getElementById('exponent').style.borderBottom = '1px solid black';
+
 
       // decimals
       // fix 
@@ -46,60 +75,75 @@
         base = base.padEnd(52, '0')
       }
 
-      return s + e + base
+      // return s + e + base
+
     }
+
+
     function start() {
       initBit('symbol', 1)
       initBit('exponent', 11)
       initBit('base', 52)
+      document.getElementById('start').disabled = true
+      var number = Number(document.getElementById('decimal').value)
+      run(toBinary(number), true)
     }
 
     function initBit(part, num) {
       var container = document.getElementById(part + 'bit');
       for (var i = 0; i < num; i++) {
-        container.appendChild(document.createElement(span, { id: part + i }))
+        var span = document.createElement('span', { id: part + i })
+        span.innerText = 0
+        container.appendChild(span)
       }
     }
 
     // TODO
+    function addBinary(a, b) {
+
+    }
+
+    function fromBinary() {
+
+    }
 
   </script>
 </head>
 
 <body>
   <div class="convertTo">
-    <div class="">
-      <input type="number" />
-      <button onclick="start();">convert to binary</button>
+    <div class="source">
+      <input type="number" id='decimal' value="0.3" />
+      <button id='start' onclick="start();">convert to binary</button>
+      <button onclick="location.reload();">reset</button>
       <span class="float"></span>
     </div>
-    <div class="format">
-
+    <div class='formula' id="formula">
     </div>
     <div class="result">
-      <div id="symbol">
-        <p></p>
+      <div class="symbol" id="symbol">
+        <p id="symbolSource"></p>
         <p id="symbolbit"></p>
       </div>
-      <div id="exponent">
-        <p></p>
+      <div class="exponent" id="exponent">
+        <p id="exponentSource"></p>
         <p id="exponentbit"></p>
       </div>
-      <div id='default' style="border: pot 1px black;">1</div>
-      <div id="base">
-        <p></p>
+      <div class='default' id='default' style="border: pot 1px black;">0</div>
+      <div class="base" id="base">
+        <p id="baseSource"></p>
         <p id="basebit"></p>
       </div>
     </div>
   </div>
   <br />
-  <div class="operator">
-    <p><input type="text" /></p>
-    <p><input type="text" /></p>
+  <div class="operator" style="opacity: 0;">
+    <p><input type="text" style="width: 800px;" /></p>
+    <p><input type="text" style="width: 800px;" /></p>
     <button>start +</button>
   </div>
   <br />
-  <div class="convertFrom">
+  <div class="convertFrom" style="opacity: 0;">
     <input type="text" name="" />
     <button>convert from binary</button>
   </div>
@@ -108,7 +152,50 @@
 
   </script>
   <style>
+    body,
+    input,
+    button {
+      font-size: x-large;
 
+    }
+
+    p {
+      margin: 0;
+      padding: 0;
+    }
+
+    .formula {
+      width: 300px;
+      height: 60px;
+      line-height: 60px;
+    }
+
+    .result {
+      display: flex;
+      flex-direction: row;
+    }
+
+    .result div {
+      height: 60px;
+
+      /* border: 1px solid black; */
+    }
+
+    .default {
+      line-height: 60px;
+    }
+
+    .symbol .default {
+      width: 80px;
+    }
+
+    .exponent {
+      width: 200px;
+    }
+
+    .base {
+      width: 800px;
+    }
   </style>
 </body>
 
