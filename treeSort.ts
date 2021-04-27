@@ -140,11 +140,12 @@ class Tree {
         root.right = node2;
       }
       if (nodes.length === 0) return root;
+
       if (node1 && nodes[0] === '#' || nodes[0].includes('!')) {
         if (node1 && nodes[0] === '#') {
           nodes.shift()
         }
-        if (nodes[0].includes('!')) {
+        if (nodes.length > 0 && nodes[0].includes('!')) {
           node2.right = new TreeNode(nodes.shift().replace('!', ''))
         }
         if (nodes.length === 0) return root;
@@ -152,10 +153,11 @@ class Tree {
         newRoot.left = root;
         return parse(newRoot, nodes);
       } else {
-        console.log('2222222222222222222', root, node2)
-        root.right = parse(node2, nodes);
-        console.log('11111111111111111111111', root, node2)
-        return root
+        node2 = parse(node2, nodes);
+        if (root.right === node2) {
+          return root
+        }
+        return node2
       }
     }
     var root = parse(null, nodeArr)
@@ -199,14 +201,124 @@ class Tree {
         this.insert(n, node.right);
       }
     }
+
+    this.root = Tree.balance_nodes(this.root)
   }
 
-  balance_nodes() {
+  static balance_nodes(root) {
+    var lN = Tree.getNodeNumber(root.left);
+    var rN = Tree.getNodeNumber(root.right);
+    if (Math.abs(lN - rN) < 2) { return root }
+    var pRoot: any = new TreeNode(root.value);
+    pRoot.left = root.left;
+    pRoot.right = root.right;
+    root.left = null
+    root.right = null
+    if (lN > rN + 1) {
+      var p1 = pRoot.left, p2 = p1.right;
+      if (p2) {
+        while (p2.right) {
+          p1 = p2;
+          p2 = p2.right;
+        }
+        root = p2
+        p1.right = p2.left
+        root.left = pRoot.left
+        root.right = pRoot.right
+        pRoot.left = null
+        pRoot.right = null
+        var p3 = root.right;
+        if (p3) {
+          while (p3.left) {
+            p3 = p3.left
+          }
+          p3.left = pRoot
+        } else {
+          root.right = pRoot
+        }
+      } else {
+        root = p1;
+        pRoot.left = null
+        root.right = pRoot
+      }
+    }
+    if (rN > lN + 1) {
+      var p1 = pRoot.right, p2 = p1.left;
+      if (p2) {
+        while (p2.left) {
+          p1 = p2;
+          p2 = p2.left;
+        }
+        p1.left = p2.right
+        p2.right = null;
+        root = p2
+        root.left = pRoot.left
+        root.right = pRoot.right
+        pRoot.left = null
+        pRoot.right = null
 
+        var p3 = root.left;
+        if (p3) {
+          while (p3.right) {
+            p3 = p3.right
+          }
+          p3.right = pRoot
+        }
+      } else {
+        root = p1
+        pRoot.right = null
+        root.left = pRoot
+      }
+    }
+    return root
   }
 
-  balance_depth() {
 
+  static medium(root) {
+    var lN = Tree.getNodeNumber(root.left);
+    var rN = Tree.getNodeNumber(root.right);
+    if (lN === rN) {
+      return root.value
+    }
+    if (lN > rN) {
+      var p = root.left
+      while (p.right) {
+        p = p.right
+      }
+      return (root.value + p.value) / 2
+    }
+    if (lN < rN) {
+      var p = root.right
+      while (p.left) {
+        p = p.left
+      }
+      return (root.value + p.value) / 2
+    }
+  }
+
+  static balance_depth(root) {
+    if (!root) return root
+    var rD = getDepth(root.right)
+    var lD = getDepth(root.left)
+
+    if (rD > lD + 1) {
+      var newRoot = root.right
+      var p = root.right.left;
+      root.right = null;
+      newRoot.left = root
+      newRoot.left.right = p
+      return Tree.balance_depth(newRoot)
+    }
+
+    if (lD > rD + 1) {
+      var newRoot = root.left
+      var p = root.left.right
+      root.left = null
+      newRoot.right = root
+      newRoot.right.left = p
+      return Tree.balance_depth(newRoot)
+    }
+    return root
   }
 
   delete(node: TreeNode) {
@@ -266,7 +378,7 @@ class Tree {
   }
 
   getNthLargest(node: TreeNode, nth: number): number {
-    const nodes = this.getNodeNumber(node);
+    const nodes = Tree.getNodeNumber(node);
     if (nodes === 0) {
       return undefined;
     }
@@ -275,7 +387,7 @@ class Tree {
       return undefined;
     }
 
-    const leftNum = node.left ? this.getNodeNumber(node.left) : 0;
+    const leftNum = node.left ? Tree.getNodeNumber(node.left) : 0;
     const extra = nth - leftNum;
     if (extra < 0) {
       return this.getNthLargest(node.left, nth);
@@ -293,10 +405,7 @@ class Tree {
     }
   }
 
-  getNodeNumber(node?: TreeNode) {
-    if (!node) {
-      node = this.root;
-    }
+  static getNodeNumber(node: TreeNode) {
     let sum = 0;
     function getNumber(node: TreeNode) {
       if (node) {
@@ -309,7 +418,7 @@ class Tree {
     return sum;
   }
 
-  draw() {
+  static draw(root) {
     const lines = [];
     function pre_order(node: TreeNode, line: number) {
       if (!lines[line]) {
@@ -323,7 +432,7 @@ class Tree {
       pre_order(node.left, line + 1);
       pre_order(node.right, line + 1);
     }
-    pre_order(this.root, 0);
+    pre_order(root, 0);
     console.log(lines);
   }
 
@@ -358,10 +467,10 @@ class TreeNode {
   }
 }
 
-const tree = new Tree([12, 15, 8, 6, 7, 3, 1, 2, 3, 5, 9, 2, 5]);
+// const tree = new Tree([12, 15, 8, 6, 7, 3, 1, 2, 3, 5, 9, 2, 5]);
 // tree.print()
-tree.insert(4);
-tree.insert(14);
+// tree.insert(4);
+// tree.insert(14);
 // tree.print()
 // console.log('NUM', tree.getNodeNumber(tree.root))
 // console.log('15th', tree.getNthLargest(tree.root, 15))
@@ -369,26 +478,75 @@ tree.insert(14);
 
 // tree.delete(tree.root.left)
 // tree.print()
-// tree.draw()
 // tree.insert(20)
 // tree.insert(13)
-// tree.draw()
 // tree.printInZigzag()
 //#endregion
-// console.log(tree.serialize())
+// console.log(tree.serialize())//#,1,#,2,2!,3,#,3,4!,5,#,5,6!,7,#,8,9!,12,14!,15,#
 // var treeRoot = Tree.deserialize('#,1,2!')
-// console.log(treeRoot)
-// console.log(Tree.serialize(Tree.deserialize(tree.serialize())))
-// console.log(Tree.serialize(Tree.deserialize('#,1,2!')))
-// console.log(Tree.deserialize('#,1,#,2,2!,3,#'))
-console.log(Tree.serialize(Tree.deserialize('#,1,#,2,2!,3,#')))
-// console.log(Tree.deserialize('5!,6,7!,8,9!,10,11!'))
-// console.log(Tree.serialize(Tree.deserialize('5!,6,7!,8,9!,10,11!')))
-// console.log(Tree.deserialize('2!,3,#,4,#,5,#'))
-// console.log(Tree.deserialize(Tree.serialize(null)))
-// console.log(Tree.serialize(Tree.deserialize('4!')))
-// console.log(Tree.deserialize('#,5,#,4,#,3,2!'))
-console.log(Tree.serialize(Tree.deserialize('#,5,#,4,#,3,2!')))
+// console.log(treeRoot) 
+function testSerialize() {
+  // console.log(tree.serialize() === Tree.serialize(Tree.deserialize(tree.serialize())))
+  console.log('#,1,2!' === Tree.serialize(Tree.deserialize('#,1,2!')))
+  // console.log(Tree.deserialize('#,1,#,2,2!,3,#'))
+  console.log('#,1,#,2,2!,3,#' === Tree.serialize(Tree.deserialize('#,1,#,2,2!,3,#')))
+  // console.log(Tree.deserialize('5!,6,7!,8,9!,10,11!'))
+  console.log('5!,6,7!,8,9!,10,11!' === Tree.serialize(Tree.deserialize('5!,6,7!,8,9!,10,11!')))
+  // console.log(Tree.deserialize('2!,3,#,4,#,5,#'))
+  console.log(null === Tree.deserialize(Tree.serialize(null)))
+  console.log('4!' === Tree.serialize(Tree.deserialize('4!')))
+  // console.log(Tree.deserialize('#,5,#,4,#,3,2!'))
+  console.log('#,5,#,4,#,3,2!' === Tree.serialize(Tree.deserialize('#,5,#,4,#,3,2!')))
+  var tree2 = new Tree([8, 4, 12, 2, 6, 10, 14, 1, 3, 5, 7, 9, 11, 13, 15])
+  console.log(Tree.serialize(tree2.root), tree2.serialize(), Tree.serialize(Tree.deserialize(tree2.serialize())))
+  // Tree.draw(tree2.root)
+  console.log(tree2.serialize() === Tree.serialize(Tree.deserialize(tree2.serialize())))
+  console.log('2!,1,4!,3,5!' === Tree.serialize(Tree.deserialize('2!,1,4!,3,5!')))
+  console.log(Tree.deserialize(Tree.serialize({
+    value: 1,
+    left: { value: 2, },
+    right: { value: 3, right: { value: 5 }, left: { value: 4 } },
+  })))
+  console.log(Tree.deserialize(Tree.serialize({
+    value: 1,
+    left: { value: 2, },
+    right: { value: 3, right: { value: 5 }, left: { value: 3 } },
+  })))
+
+}
+testSerialize()
+
+
+// test balance_nodes
+// console.log('origin')
+// var root = tree.root;
+// Tree.draw(root)
+// console.log('balance_nodes')
+// root = Tree.balance_nodes(root)
+// Tree.draw(root)
+
+// // test balance_depth
+// console.log('balance_depth')
+// root.left = Tree.balance_depth(root.left)
+// root.right = Tree.balance_depth(root.right)
+// Tree.draw(root)
+
+// test medium
+// 1.
+// var tree3 = new Tree([])
+// for (var i of [1, 2, 5, 3, 6, 7, 4, 6, 5, 8, 9, 8, 4]) {
+//   tree3.insert(i)
+//   console.log(Tree.medium(tree3.root))
+// }
+// 2.
+// var tree3 = new Tree([])
+// for (var i of [5, 2, 3, 4, 1, 6, 7, 0, 8]) {
+//   tree3.insert(i)
+//   console.log(Tree.medium(tree3.root))
+// }
+// Tree.draw(tree3.root)
+// var root = Tree.balance_nodes(tree3.root)
+// Tree.draw(root)
 
 
 
@@ -566,5 +724,7 @@ function getDepth(pRoot) {
   }
   return depth;
 }
+
+
 
 // console.log(getDepth(tree.root))

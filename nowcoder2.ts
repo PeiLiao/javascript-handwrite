@@ -311,7 +311,19 @@ function InversePairs_merge(data: number[]) {
 // console.log(_try, hash_try, recursion_try)
 // InversePairs_merge([1, 3, 4, 6, 6, 3, 2, 2, 4, 5, 9, 8, 7, 9, 10, 2, 2, 3])
 
-
+InversePairs_merge([4, 5, 6, 7])
+function testLargeArray(len) {
+  var data = [];
+  while (len--) {
+    data.push((Math.random() * 10000) % 1)
+  }
+  console.log(InversePairs(data))
+  console.log(InversePairs_hash(data))
+  console.log(InversePairs_recursion(data))
+  InversePairs_merge(data)
+}
+// testLargeArray(10000)
+// testLargeArray(50000)
 
 
 // worst
