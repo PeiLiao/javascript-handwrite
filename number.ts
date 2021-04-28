@@ -98,6 +98,18 @@ function and(str1, str2) {
   return str
 }
 
+function add(str1, str2) {
+  let s = Math.max(str1.length, str2.length)
+  str1 = str1.padStart(s, '0')
+  str2 = str2.padStart(s, '0')
+  let str = '', f = 0;
+  while (s--) {
+    var cur = f + Number(str1[s]) && Number(str2[s])
+    str = cur % 2 + str
+    f = cur > 1 ? 1 : 0
+  }
+  return str
+}
 
 function add0203() {
   testBinary(0.2, true)

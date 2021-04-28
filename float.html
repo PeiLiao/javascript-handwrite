@@ -2,16 +2,17 @@
 
 <head>
   <script>
-    var tick = 1000, step = 0;
-    function run(gen) {
+    var tick = 100, step = 0, taskQueue = [];
+    function runGenerator(gen, rate = 1) {
       var id = setInterval(() => {
         if (!gen.next().value) {
           clearInterval(id)
         }
-      }, tick);
+      }, tick * rate);
+      taskQueue.push(id)
     }
 
-    function* toBinary(number, fix) {
+    function* decimalToBinary(number, fix) {
       // step1: symbol
       var s = '0'
       if (number < 0) {
@@ -34,76 +35,175 @@
       }
 
 
-      yield document.getElementById('formula').innerHTML = `(${s === '0' ? '+' : '-'}) ${num}*2^${r}`;
-      yield document.getElementById('formula').style.borderBottom = '1px solid black';
+      yield function () {
+        document.getElementById('formula').innerHTML = `(${s === '0' ? '+' : '-'}) ${num}*2^${r}`;
+        document.getElementById('formula').style.border = '1px solid black';
+        return true
+      }()
 
-      yield document.getElementById('symbolSource').innerHTML = s === '0' ? '+' : '-';
+      yield function () {
+        document.getElementById('symbolSource').innerHTML = s === '0' ? '+' : '-';
+        document.getElementById('symbol').style.border = '1px solid black';
+        return true
+      }()
+
       yield document.getElementById('symbolbit').innerHTML = s;
-      yield document.getElementById('symbol').style.borderBottom = '1px solid black';
-
       yield document.getElementById('exponentSource').innerHTML = r;
-      yield document.getElementById('default').innerHTML = 1;
-      yield document.getElementById('default').style.borderBottom = '1px solid black';
 
-      yield document.getElementById('baseSource').innerHTML = num - 1;
+      yield document.getElementById('default').style.visibility = 'visible';
+      yield document.getElementById('default').style.color = 'gray';
+      yield function () {
+        document.getElementById('default').style.color = 'black';
+        document.getElementById('default').innerHTML = 1;
+        document.getElementById('default').style.border = '1px solid black';
+        return true
+      }()
 
 
       var e = '';
       r += 1023
       e = r.toString(2).padStart(11, '0')
 
-      yield document.getElementById('exponentSource').innerHTML += `(${r})`;
+      yield function () {
+        document.getElementById('exponentSource').innerHTML += `(${r})`;
+        document.getElementById('exponent').style.border = '1px solid black';
+        return true
+      }()
+      // skip converting integer to binary
       yield document.getElementById('exponentbit').innerHTML = e;
-      yield document.getElementById('exponent').style.borderBottom = '1px solid black';
 
 
       // decimals
       // fix 
       num = fix ? parseFloat((num % 1).toPrecision(10)) : num % 1
-      var total = 52;
-      var base = '';
+      yield function () {
+        document.getElementById('baseSource').innerHTML = num;
+        document.getElementById('base').style.border = '1px solid black';
+        return true
+      }()
+
+      var total = 52, base = '', completed = false;
       while (num !== 0 && total--) {
-        base += num * 2 >= 1 ? 1 : 0
-        num = (num * 2) % 1
+        var bitGenerator = function* (total) {
+          var cur = num * 2 >= 1 ? 1 : 0
+          num = parseFloat((num * 2 % 1).toPrecision(15))  //(num * 2) % 1
+          yield document.getElementById('baseSource').innerHTML = `<span style="border:1px solid red;">${cur}</span><span>.</span>${num.toString().split('.')[1]}`
+          base += cur
+          yield document.getElementById('base' + total).style.color = 'gray';
+          yield document.getElementById('base' + total).innerText = cur;
+          yield document.getElementById('baseSource').innerHTML = `<span style="border:1px solid red;">0</span><span>.</span>${num.toString().split('.')[1]}`
+        }
+        setTimeout((total) => {
+          runGenerator(bitGenerator(total))
+          if (!total) {
+            completed = true
+          }
+        }, tick * 5 * (51 - total), total);
       }
 
+
+      // after while loop stopped
       // carry bit
-      if (total < 0 && num * 2 >= 1) {
-        base = (parseInt(base, 2) + 1).toString(2)
-        base = base.padStart(52, '0')
-      } else {
-        base = base.padEnd(52, '0')
-      }
-
+      setTimeout(() => {
+        let id = setInterval((num) => {
+          if (completed) {
+            debugger;
+            if (total < 0 && num * 2 >= 1) {
+              var carrybitGenerator = function* (num) {
+                var n = parseFloat((num * 2 % 1).toPrecision(16));
+                yield document.getElementById('baseSource').innerHTML = `<span style="border:1px solid red;">1</span><span>.</span>${n.toString().split('.')[1] || 0}`;
+                yield document.getElementById('basebit').innerHTML += '+1';
+                base = (parseInt(base, 2) + 1).toString(2)
+                base = base.padStart(52, '0')
+                yield document.getElementById('basebit').innerHTML = base;
+              }
+              runGenerator(carrybitGenerator(num), 4)
+            } else {
+              base = base.padEnd(52, '0')
+              document.getElementById('basebit').innerHTML = base;
+            }
+            clearInterval(id)
+          }
+        }, 200, num);
+      }, tick * 5 * 53, num)
       // return s + e + base
 
     }
 
 
-    function start() {
-      initBit('symbol', 1)
-      initBit('exponent', 11)
-      initBit('base', 52)
-      document.getElementById('start').disabled = true
-      var number = Number(document.getElementById('decimal').value)
-      run(toBinary(number), true)
-    }
-
-    function initBit(part, num) {
-      var container = document.getElementById(part + 'bit');
-      for (var i = 0; i < num; i++) {
-        var span = document.createElement('span', { id: part + i })
-        span.innerText = 0
-        container.appendChild(span)
+    function initialize() {
+      function _initialize(part, num) {
+        var container = document.getElementById(part + 'bit');
+        for (var i = 0; i < num; i++) {
+          var span = document.createElement('span')
+          span.id = part + i
+          span.innerText = 0
+          container.appendChild(span)
+        }
       }
+      _initialize('symbol', 1)
+      _initialize('exponent', 11)
+      _initialize('base', 52)
     }
 
-    // TODO
-    function addBinary(a, b) {
+    function reset() {
+
+      while (taskQueue.length > 0) {
+        clearInterval(taskQueue.pop())
+      }
+
+      document.getElementById('symbol').innerHTML = null;
+      document.getElementById('exponent').innerHTML = null;
+      document.getElementById('base').innerHTML = null;
+      document.getElementById('default').innerHTML = null;
 
     }
 
-    function fromBinary() {
+    // onclick event
+    function start() {
+      // avoid
+      document.getElementById('start').disabled = true
+      //
+      initialize()
+      runGenerator(decimalToBinary(Number(document.getElementById('decimal').value), true))
+    }
+
+    // onclick event
+    function add() {
+      var str1 = document.getElementById('binaryStr1').value;
+      var str2 = document.getElementById('binaryStr2').value;
+      addBinaryStr(str1, str2)
+    }
+
+    // onclick event
+    function recover() {
+
+    }
+
+    function addBinaryStr(str1, str2) {
+      let s = Math.max(str1.length, str2.length)
+      str1 = str1.padStart(s, '0')
+      str2 = str2.padStart(s, '0')
+      let str = '', f = 0;
+      while (s--) {
+        var cur = f + Number(str1[s]) && Number(str2[s])
+        str = cur % 2 + str
+        f = cur > 1 ? 1 : 0
+      }
+      document.getElementById('sum').innerText = f + str
+    }
+
+    function binaryToDecimal(str) {
+      let s = str[0];
+      let e = str.subString(1, 12)
+      let base = str.subString(12, 64)
+      function baseToDecimal(str) {
+        let num = 0;
+        for (let s = 0; s < str.length; s++) {
+          num += str[s] * Math.pow(2, -1 - s)
+        }
+        return 1 + num;
+      }
 
     }
 
@@ -113,9 +213,9 @@
 <body>
   <div class="convertTo">
     <div class="source">
-      <input type="number" id='decimal' value="0.3" />
+      <input type="number" id='decimal' value="0.1" />
       <button id='start' onclick="start();">convert to binary</button>
-      <button onclick="location.reload();">reset</button>
+      <button onclick="reset();">reset</button>
       <span class="float"></span>
     </div>
     <div class='formula' id="formula">
@@ -129,7 +229,7 @@
         <p id="exponentSource"></p>
         <p id="exponentbit"></p>
       </div>
-      <div class='default' id='default' style="border: pot 1px black;">0</div>
+      <div class='default' id='default' style="border: pot 1px black;visibility: hidden;">0</div>
       <div class="base" id="base">
         <p id="baseSource"></p>
         <p id="basebit"></p>
@@ -137,15 +237,17 @@
     </div>
   </div>
   <br />
-  <div class="operator" style="opacity: 0;">
-    <p><input type="text" style="width: 800px;" /></p>
-    <p><input type="text" style="width: 800px;" /></p>
-    <button>start +</button>
+  <div class="operator">
+    <p><input type="text" style="width: 1000px;" id='binaryStr1' /></p>
+    <p><input type="text" style="width: 1000px;" id='binaryStr2' /></p>
+    <p id='sum'></p>
+    <button id='add' onclick="add();">start +</button>
   </div>
+
   <br />
-  <div class="convertFrom" style="opacity: 0;">
-    <input type="text" name="" />
-    <button>convert from binary</button>
+  <div class="convertFrom">
+    <input type="text" id='binary' />
+    <button id='recover' onclick="recover();">convert from binary</button>
   </div>
   <script>
 
@@ -160,13 +262,14 @@
     }
 
     p {
-      margin: 0;
+      margin: auto;
       padding: 0;
     }
 
     .formula {
       width: 300px;
       height: 60px;
+      margin: 10px 0;
       line-height: 60px;
     }
 
@@ -177,8 +280,7 @@
 
     .result div {
       height: 60px;
-
-      /* border: 1px solid black; */
+      margin-right: 10px;
     }
 
     .default {
