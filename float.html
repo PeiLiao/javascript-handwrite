@@ -1,4 +1,5 @@
 <html>
+<meta charset="utf-8">
 
 <head>
   <script>
@@ -170,6 +171,8 @@
     function add() {
       var str1 = document.getElementById('binaryStr1').value;
       var str2 = document.getElementById('binaryStr2').value;
+      // this function add integer binary only
+      // TODO add 64bits float binary 
       addBinaryStr(str1, str2)
     }
 
@@ -202,8 +205,8 @@
 
     function binaryToDecimal(str) {
       let sStr = str[0];
-      let eStr = str.subString(1, 12)
-      let baseStr = str.subString(12, 64)
+      let eStr = str.substring(1, 12)
+      let baseStr = str.substring(12, 64)
       let base = function base(str) {
         let num = 0;
         for (let s = 0; s < str.length; s++) {
@@ -215,15 +218,15 @@
       let e = function exp(str) {
         return parseInt(eStr, 2) - 1023
       }(eStr)
-
-      return (eStr === 1 ? -1 : 0) * Math.pow((1 + base), e)
+      return (eStr === 1 ? -1 : 1) * Math.pow(base, e)
     }
 
   </script>
 </head>
 
 <body>
-  <div class="convertTo">
+  <div class="convertTo" style="padding: 2px 10px;border: 1px dashed black;">
+    <p>十进制转二进制</p>
     <div class="source">
       <input type="number" id='decimal' value="0.1" />
       <button id='start' onclick="start();">convert to binary</button>
@@ -241,7 +244,7 @@
         <p id="exponentSource"></p>
         <p id="exponentbit"></p>
       </div>
-      <div class='default' id='default' style="border: pot 1px black;visibility: hidden;">0</div>
+      <div class='default' id='default' style="border:1px solid black;visibility: hidden;">0</div>
       <div class="base" id="base">
         <p id="baseSource"></p>
         <p id="basebit"></p>
@@ -249,7 +252,8 @@
     </div>
   </div>
   <br />
-  <div class="operator">
+  <div class="operator" style="padding: 2px 10px;border: 1px dashed black;">
+    <p>二进制相加</p>
     <p><input type="text" style="width: 1000px;" id='binaryStr1' /></p>
     <p><input type="text" style="width: 1000px;" id='binaryStr2' /></p>
     <p id='sum'></p>
@@ -257,8 +261,9 @@
   </div>
 
   <br />
-  <div class="convertFrom">
-    <input type="text" id='binary' />
+  <div class="convertFrom" style="padding: 2px 10px;border: 1px dashed black;">
+    <p>二进制转十进制</p>
+    <input type="text" id='binary' style="width: 1200px;" />
     <button id='recover' onclick="recover();">convert from binary</button>
     <p id='number'>
     <p>
@@ -273,6 +278,10 @@
     button {
       font-size: x-large;
 
+    }
+
+    body div {
+      width: 1200px;
     }
 
     p {
@@ -311,6 +320,7 @@
 
     .base {
       width: 800px;
+    }
     }
   </style>
 </body>
