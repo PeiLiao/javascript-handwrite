@@ -1,0 +1,118 @@
+<html>
+<meta charset="utf-8" />
+
+<head>
+    <script>
+        var data = {
+            pei: [58.8, 58.5, 58.5, 58.5, 58.5, 59.1, 58.3, 58.8],
+            ning: [],
+            sisi: [],
+            shu: []
+        }
+
+        var aim = {
+            pei: 56.3
+        }
+
+        var colorMap = {
+            pei: 'palevioletred',
+            ning: 'green',
+            sisi: 'blueviolet',
+            shu: 'orange'
+        }
+        function drawLine(points, color, aim) {
+
+            var interval = 1200 / points.length;
+
+            var canvas = document.getElementById('linechart');
+            var context = canvas.getContext('2d');
+            context.beginPath();
+            context.lineWidth = 1;
+            context.strokeStyle = color;
+            points.forEach((point, index) => {
+                context.moveTo(index * interval, point * 20);
+                if (index + 1 < points.length) {
+                    context.lineTo((index + 1) * interval, points[index + 1] * 20);
+                }
+            })
+            context.closePath();
+            context.stroke();
+
+            context.setLineDash([10, 20]);
+            context.beginPath();
+            context.lineWidth = 1;
+            context.moveTo(0, aim * 20);
+            context.lineTo(1200, aim * 20);
+            context.closePath();
+            context.stroke();
+
+        }
+
+        function onCanvasLoad() {
+            Object.keys(data).forEach((key) => {
+                drawLine(data[key].map((n) => n - 50), colorMap[key], aim[key] - 50)
+            })
+        }
+
+    </script>
+</head>
+
+<body onload="onCanvasLoad()">
+    <div>
+        <canvas id='linechart' height="600" width="1000"></canvas>
+    </div>
+    <div id='bonus-pool'>
+        <div id='pei'>
+            <p>pei</p>
+            <div>60</div>
+        </div>
+        <div id='ning'>
+            <p>ning</p>
+            <div>60</div>
+        </div>
+        <div id='sisi'>
+            <p>sisi</p>
+            <div>60</div>
+        </div>
+        <div id='shu'>
+            <p>shu</p>
+            <div>60</div>
+            <div>60</div>
+        </div>
+    </div>
+    <p>total:300</p>
+    <style type="text/css">
+        canvas {
+            transform: rotateX(180deg);
+        }
+
+        #bonus-pool {
+            display: flex;
+            flex-direction: row;
+        }
+
+        #bonus-pool>div {
+            width: 100px;
+        }
+
+        #pei div {
+            background-color: palevioletred;
+        }
+
+        #ning div {
+            background-color: green;
+        }
+
+        #sisi div {
+            background-color: blueviolet;
+        }
+
+        #shu div {
+            background-color: orange;
+        }
+    </style>
+
+    </style>
+</body>
+
+</html>
