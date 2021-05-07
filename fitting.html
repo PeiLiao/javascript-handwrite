@@ -5,13 +5,16 @@
     <script>
         var data = {
             pei: [58.8, 58.5, 58.5, 58.5, 58.5, 59.1, 58.3, 58.8],
-            ning: [],
-            sisi: [],
-            shu: []
+            ning: [53.6, 53.4, 53.5, 54.3, 53.8, 53.7, 54, 53.8],
+            sisi: [65.4, 65.7, 65.7, 65.6, 65.7, 65.7, 66.3, 65.5],
+            shu: [53.1, 52.7, 52.5, 52.3, 52.5, 52.6, 53, 53.1]
         }
 
         var aim = {
-            pei: 56.3
+            pei: 56.3,
+            ning: 52.1,
+            sisi: 60.4,
+            shu: 51.6
         }
 
         var colorMap = {
@@ -26,13 +29,14 @@
 
             var canvas = document.getElementById('linechart');
             var context = canvas.getContext('2d');
+            context.setLineDash([1, 1]);
             context.beginPath();
             context.lineWidth = 1;
             context.strokeStyle = color;
             points.forEach((point, index) => {
-                context.moveTo(index * interval, point * 20);
+                context.moveTo(index * interval, point * 40);
                 if (index + 1 < points.length) {
-                    context.lineTo((index + 1) * interval, points[index + 1] * 20);
+                    context.lineTo((index + 1) * interval, points[index + 1] * 40);
                 }
             })
             context.closePath();
@@ -41,8 +45,8 @@
             context.setLineDash([10, 20]);
             context.beginPath();
             context.lineWidth = 1;
-            context.moveTo(0, aim * 20);
-            context.lineTo(1200, aim * 20);
+            context.moveTo(0, aim * 40);
+            context.lineTo(1200, aim * 40);
             context.closePath();
             context.stroke();
 
@@ -59,7 +63,7 @@
 
 <body onload="onCanvasLoad()">
     <div>
-        <canvas id='linechart' height="600" width="1000"></canvas>
+        <canvas id='linechart' height="800" width="1000"></canvas>
     </div>
     <div id='bonus-pool'>
         <div id='pei'>
